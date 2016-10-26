@@ -1,0 +1,120 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage[top=2cm, bottom=2cm, left=3cm, right=3cm, headsep=0mm, footskip=10mm]{geometry}
+\usepackage[ngerman]{babel}
+\usepackage[T1]{fontenc}  % Silbentrennung bei Sonderzeichen
+\usepackage[utf8]{inputenc} %Umlaute & Co
+\usepackage[normalem]{ulem}
+\usepackage{mathtools,amsthm,amssymb,amsfonts}
+\usepackage{marvosym}
+\usepackage{gauss} % Gaussverfahren mit Pfeilen
+\usepackage[table,xcdraw]{xcolor}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{csquotes}
+\usepackage{fancyhdr}
+\usepackage{amssymb}
+\usepackage[neverdecrease,defblank]{paralist}   % enumerate, itemize,...
+\usepackage[shortlabels]{enumitem}
+\usepackage{titlesec}
+\usepackage{bm} %Fette Mathezeichen
+\usepackage[onehalfspacing]{setspace}
+\usepackage{array}
+\usepackage{ifthen}
+\usepackage{xparse}
+\usepackage{etoolbox} % toolbox of programming tools
+\usetikzlibrary{trees,automata,arrows,shapes}
+\usetikzlibrary{shapes.geometric}
+\newcommand{\warningsign}{\tikz[baseline=-.75ex] \node[shape=regular polygon, regular polygon sides=3, inner sep=0pt, draw, thick] {\textbf{!}};}
+
+\begin{document}
+\begin{titlepage}
+\centering
+	{\scshape\Large Eberhard Karls Universität Tübingen \par}
+	\vspace{1cm}
+	{\scshape\Large \par}
+	\vspace{1.5cm}
+	{\huge\bfseries Informatik I Vorlesung\par}
+	\vspace{2cm}
+	{\Large Wintersemester 2016/2017 \par}
+	\vfill
+	Mitschrieb von \par Julian Wolff
+
+	\vfill
+
+% Bottom of the page
+	{\large Aktueller Stand \today\par}
+\end{titlepage}
+\tableofcontents
+\newpage
+\section{Scheme: Ausdrücke, Auswertung und Abstraktion}
+\subsection{REPL}
+\begin{center}
+\begin{tabular}{|l|c|}
+\hline
+Definition&DrRacket\\
+\hline
+Interaktion&REPL\\
+\hline
+\end{tabular}
+\end{center}
+
+Die Anwendung von Funktionen wird in Scheme \underline{ausschließlich} in \underline{Präfixnotation} durchgeführt:
+\begin{center}
+\begin{tabular}{|cc|}
+\hline
+Mathematik & Scheme\\
+\hline
+44-2 & (-44 2)\\
+f(x,y) & (f x y)\\
+$\sqrt{81}$ & (sqrt 81)\\
+& (floor x)\\
+$9^2 $& (expt 9 2)\\
+3! & (! 3)\\
+\hline
+\end{tabular}\\
+
+Allgemein: $\langle $Funktion$\rangle \langle$ argument$\rangle$)
+\end{center}
+(+ 402 ) und (odd? 42) sind Beispiele für die \underline{Ausdrücke}, die bei Auswertung einen Wert liefern. (Notation $\rightsquigarrow$) heißt Auswertung/Evaluation/Reduktion.\\
+(+ 40 2) $\underset{Eval}{\rightsquigarrow}$ 42\\
+(add? 42)$\underset{Eval}{\rightsquigarrow}$ \#f\\
+\\
+Interaktionsfenster:\\ 
+Re$\underset{\text{\large{Loop}}}{\underbracket{\text{ad}   \rightsquigarrow \text{Eval}  \rightsquigarrow \text{Pri} }}$nt      \hfil     REPL
+\\
+\\
+\subsection{Literale}
+\uline{Literale} stehen für einen konstanten Wert (auch: \underline{Konstante}) und sind nicht weiter reduzierbar.
+\begin{center}\begin{tabular}{ccl}
+\underline{Literal} & &\underline{Signatur}\\
+\#t \#f & (true, false, Wahrheitswerte) & boolean\\
+\enquote{ac} \enquote{x} \enquote{ } & (Zeichenketten) & string\\
+0 1904 -42 007 & (ganze Zahlen) & integer\\
+0.42 3.1415 -273.15 & (Fließkommazehlen) & real\\
+1/2 3/4 -1/10 & (rationale Zahlen) & rational\\
+ \includegraphics[width=0.17\textwidth]{frod.jpg}& (Bilder) & image\\
+\end{tabular}
+\end{center}
+Auswertung \underline{zusammengesetzte Ausdrücke} (composite expression) in mehreren Schritten (Steps), "von innen nach außen" , bis keine weitere Reduktion möglich ist:\\
+(+(+20 20)(+ 1 1)) $ \rightsquigarrow$ (+ 40 (+ 1 1))  $ \rightsquigarrow$ (+ 40 2)  $ \rightsquigarrow$ 42\\
+\\
+\underline{Beispiel:}\\
+$0.7+(\frac{1}{2}/0.25)-(0.6/0.3)=0.7$\\
+\\
+\warningsign\underline{Achtung:} Scheme rundet bei Arithmetik mit Fließkommazahlen (interne Darstellung nicht präzise). Die Arithmetik mit rationalen Zahlen ist exakt.\\
+\subsection{Identifier}
+Ein Wert kann an einen \underline{Namen} (identifier) \underline{gebunden} werden, durch(define$ \langle$id$ \rangle \langle$expression$\rangle$)\\
+Es erlaubt konsistente Wiederverwendung und dient der Selbstdokumentation von Programmen.\\
+\\
+\warningsign \uline{Achtung:} Dies ist eine \underline{Spezialform} und kein Ausdruck. Insbesondere besitzt diese Spezialform keinen Wert, sondern einen Effekt: der Name $\langle$id$\rangle$ wird durch den Wert von $\langle $expression$\rangle$ \underline{gebunden}. Namen können in Scheme fast beliebig gewählt werden, solange
+\begin{itemize}
+\item[$\bullet$]die Zeichen $ () \lbrack \rbrack   \{\} ", '; \# \backslash$ | nicht vorkommen
+\item[$\bullet$]der name nicht einem numerischen Literal gleicht
+\item[$\bullet$] keinen Whitespaße (Leerzeichen, Tabulatoren, Neuwlines) enthalten sind
+\end{itemize}
+\uline{Beispiel:} Euro $\rightarrow$ US-\$\\ \\
+\warningsign \uline{ Achtung:} Groß-/Kleinschreibung ist in Identifiern \underline{nicht} relevant.\\
+
+
+
+\end{document}
