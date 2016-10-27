@@ -95,6 +95,7 @@ Re$\underset{\text{\large{Loop}}}{\underbracket{\text{ad}   \rightsquigarrow \te
  \includegraphics[width=0.17\textwidth]{frod.jpg}& (Bilder) & image\\
 \end{tabular}
 \end{center}
+\subsection{Zusammengesetzte Ausdrücke}
 Auswertung \underline{zusammengesetzte Ausdrücke} (composite expression) in mehreren Schritten (Steps), "von innen nach außen" , bis keine weitere Reduktion möglich ist:\\
 (+(+20 20)(+ 1 1)) $ \rightsquigarrow$ (+ 40 (+ 1 1))  $ \rightsquigarrow$ (+ 40 2)  $ \rightsquigarrow$ 42\\
 \\
@@ -114,6 +115,64 @@ Es erlaubt konsistente Wiederverwendung und dient der Selbstdokumentation von Pr
 \end{itemize}
 \uline{Beispiel:} Euro $\rightarrow$ US-\$\\ \\
 \warningsign \uline{ Achtung:} Groß-/Kleinschreibung ist in Identifiern \underline{nicht} relevant.\\
+
+\subsection{Lambda-Abstraktion}Eine \uline{Lambda-Abstraktion} (auch: Funktion, Prozedur) erlaubt die Formulierung von Ausdrücken, in denen mittels \uline{Parametern} von konkreten Werten abstrahiert wird:
+
+(lambda ($ \langle p_1\rangle \langle p_2\rangle...) \langle$expr$\rangle$)  \\
+expr ist der Rumpf und enthält Vorkommen der Paramenter $\langle p_i \rangle$. \\
+\\
+
+(lambda...) ist eine Spezialform. Der Wert der Lambda-Abstraktion $\#\langle$procedure$\rangle$\\
+Die \uline{Anwendung} (auch: Applikation) der Lambda-Abstraktion führt zur Ersetzung aller Vorkommen der Parameter im Rumpf durch die angegebenen konkreten \uline{Argumente:}\\
+\\
+\begin{tabular}{|l}
+
+(lambda (days)(*days(*155 minutes-in-a-day)) 365)\\
+$\rightsquigarrow$ (über pfeil ! Zeichen) (*365 ( 155 minutes-in-a-day))\\
+$\rightsquigarrow$ ...\\
+$\rightsquigarrow$ 81468000\\
+\end{tabular}
+\\
+\\
+\subsection{Kommentare}
+In Scheme leitet ein Semikolon einen \uline{Kommentar} ein, der bis zum Zeilenende reicht und von Racket bei der Auswertung ignoriert wird.\\
+Prozeduren/Funktionen sollen im Programm eine ein- bis zweizeilige \uline{Kurzbeschreibung} vorangestellt werden. 
+
+\subsection{Signaturen}
+Eine \uline{Signatur} prüft, ob ein Name $\langle$id$\rangle$ an einen Wert einer angegebenen Sorte gebunden wird. Signaturverletzungen werden protokolliert.\\
+(: $\langle$ id $\rangle$ $\langle $signatur$\rangle$)\\
+Bereits eingebundene Signaturen sind:
+\begin{itemize}[$\bullet$]
+\item natural \quad $\mathbb{N}$
+\item ingeger \quad$\mathbb{Z}$
+\item rational\quad $\mathbb{Q}$
+\item real  \hspace{10mm}$\mathbb{R}$
+\item number\quad $\mathbb{C}$
+\item boolean
+\item string
+\item image
+\end{itemize}
+
+\warningsign Der Doppelpunkt \enquote{ : } ist eine Spezialform und hat daher keinen Wert, aber einen Effekt: Eine Signaturprüfung wird durchgeführt.\\
+
+\subsection{Prozedur-Signaturen}
+Prozedur-Signaturen spezifizieren Signaturen sowohl für die Parameter $\langle p_1 \rangle,\langle p_2\rangle$, ... als auch für den Ergebniswert der Prozedur:\\
+(:$\langle$id$\rangle$($\langle$signatur-$p_1\rangle$ $\langle$signatur-$p_2\rangle$ ... $\rightarrow \langle$signatur-ergebnis$\rangle$))\\
+
+Prozedur-Signaturen werden bei \uline{jeder} Anwendung der Funktion $\langle$id$\rangle$ auf Verletzung geprüft.\\
+\subsection{Testfälle}
+\uline{Testfälle} dokumentieren das erwartende Ergebnis einer Prozedur für ausgewählte Argumente:\\
+(check-expect $\langle e_1\rangle$ $\langle e_2 \rangle$)\\
+Werte den Ausdruck $\langle e_1\rangle$ aus und teste, ob der erhaltene Wert der Erwartung (=Wert des Ausdruck $\langle e_2 \rangle$) entspricht.\\
+Einer Prozedurdefinition sollten Testfälle direkt vorangestellt werden.\\
+\warningsign   \enquote{check-expect} ist eine Spezialform und hat daher keinen Wert. Eine Testverletztung wird als Effekt protokolliert.
+
+
+
+
+
+
+
 
 
 
