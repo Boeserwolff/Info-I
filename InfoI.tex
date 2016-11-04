@@ -16,6 +16,7 @@
 \usepackage[neverdecrease,defblank]{paralist}   % enumerate, itemize,...
 \usepackage[shortlabels]{enumitem}
 \usepackage{titlesec}
+\usepackage{listings}
 \usepackage{bm} %Fette Mathezeichen
 \usepackage[onehalfspacing]{setspace}
 \usepackage{array}
@@ -25,6 +26,31 @@
 \usetikzlibrary{trees,automata,arrows,shapes}
 \usetikzlibrary{shapes.geometric}
 \newcommand{\warningsign}{\tikz[baseline=-.75ex] \node[shape=regular polygon, regular polygon sides=3, inner sep=0pt, draw, thick] {\textbf{!}};}
+ 
+%TODO: lstdefinelanguage auf DrRacket anpassen 
+ 
+\lstdefinelanguage{Dr}
+{morekeywords={one,two,three,four,five,six,seven,eight,
+nine,ten,eleven,twelve,o,clock,rock,around,the,tonight},
+sensitive=false,
+morecomment=[l]{//},
+morecomment=[s]{/*}{*/},
+morestring=[b]",
+}
+
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=Dr,
+  showstringspaces=false,
+  basicstyle=\footnotesize\ttfamily,
+  keywordstyle=\bfseries\color{green!40!black},
+  commentstyle=\itshape\color{purple!40!black},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+}
 
 \begin{document}
 \begin{titlepage}
@@ -128,7 +154,7 @@ Die \uline{Anwendung} (auch: Applikation) der Lambda-Abstraktion führt zur Erse
 \begin{tabular}{|l}
 
 (lambda (days)(*days(*155 minutes-in-a-day)) 365)\\
-$\rightsquigarrow$ (über pfeil ! Zeichen) (*365 ( 155 minutes-in-a-day))\\
+$\overset{!}{\rightsquigarrow}$ (*365 ( 155 minutes-in-a-day))\\
 $\rightsquigarrow$ ...\\
 $\rightsquigarrow$ 81468000\\
 \end{tabular}
@@ -166,14 +192,89 @@ Prozedur-Signaturen werden bei \uline{jeder} Anwendung der Funktion $\langle$id$
 Werte den Ausdruck $\langle e_1\rangle$ aus und teste, ob der erhaltene Wert der Erwartung (=Wert des Ausdruck $\langle e_2 \rangle$) entspricht.\\
 Einer Prozedurdefinition sollten Testfälle direkt vorangestellt werden.\\
 \warningsign   \enquote{check-expect} ist eine Spezialform und hat daher keinen Wert. Eine Testverletztung wird als Effekt protokolliert.
+\subsection{Erinnerung}\uline{Konstruktionsanleitung für Prozeduren:}\\
+\begin{itemize}
+\item kurzbeschreibung (ein- bis zweizeiliger Kommentar mit Bezug auf PArameternamen und Ergebnis)
+\item Signatur (:$\langle$ name $\rangle$ (... $\rightarrow$))
+\item Testfälle check-expect/ ceack-within
+\item Prozedurgerüst (define $\langle$name$\rangle$ (lambda ($\langle p_1\rangle \langle p_2\rangle $ ))
+\item Rumpf programmieren $\langle$rumpf$\rangle$)
+\end{itemize}
+\newpage
+\subsection{Top-Down-Entwurf (Programmieren mit "Wunschdenken")}
+Beispiel: Sunset auf Tatooine (SW Episode IV)
 
+Zeichne Szene zu Zeitpunkt t (t=0 ... 100)
+\begin{itemize}
+\item[(1)] Himmel verfärbt sich von blau (t=0) zu rot (t=100)
+\item[(2)] Sonne(n) versinkt (bei t=100 hinter Horizont)
+\item [(3)]Luke starrt auf Horizont (bei jeden t)
+\end{itemize}
+Zeichne Szene von hinten nach vorne:\\
+\begin{figure}[htbp] 
+  \centering
+     \includegraphics[width=0.7\textwidth]{wunsch.png}
+     \caption{Frodo auf dem Weg nach Mord... äh ich meine natürlich Luke auf Tatooine}
+\end{figure}
 
+\begin{lstlisting}[style=customc]
+;Zeichne Tatooine Sunset zu Zeitpunkt t
+(:tatooine (natural -> image))
+(define tatooine
+    (lambda (t)
+        (overlay/pinhole (luke t)
+                         (sun t )
+                         (sky t ))))
 
+\end{lstlisting}
+\newpage
+\subsection{Reduktionsregeln für Scheme ($\rightsquigarrow$)}
+Fallunterscheidung je nach Ausdruck:\\
+\begin{itemize}
+\item
+\begin{tabular}{lcccccccr}
+Literal l (1, $\#t $, "Karotte", ...)&&&&&&&& $[ eval_{1} ] $\\
+\end{tabular}\\
+ l $\rightsquigarrow$ l (keine Reduktion möglich)
+ 
+\item
+\begin{tabular}{lccccccccccccccr}
+Identifier $\langle$id$\rangle$  &&&&&&&&&&&&&&&  $[eval_{id}]$\\
+\end{tabular} \\
+$\langle$id$\rangle\rightsquigarrow$ Wert, an den $\langle$id$\rangle$ gebunden
+\item 
+\begin{tabular}{lcccccccccccr}
+Lambda-Abstraktion &&&&&&&&&&&& [$eval_\lambda$]\\
+\end{tabular}\\
+(lambda (...)...) $\rightsquigarrow$ (lanmbda (...)...)
+\item Applikation (f $e_1 e_2$...)\\
+\begin{itemize}
+\item f, $e_1$, $e_2$, ... mittels $\rightsquigarrow$, erhalte f',$e_1'$, $e_2'$ ...
+\item $\left[
+\begin{tabular}{lcr}
+Operation auf $e_1', e_2'$...&     Falls f primitive   &                [apply/prim]\\
+anwenden & (eingebaute) Operation & \\
+&&\\
+Argumentwerte $e_1', e_2', ...$ in & falls f' &    [$apply_\lambda$]\\den Rumpf einsetzen, den&Lambda-Abstraktion&\\ Rumpf mittels $\rightsquigarrow$ reduzieren    
+\end{tabular}\right]$\\
 
-
-
-
-
-
+Wiederhole Anwendung von $\rightsquigarrow$ bis keine Reduktion mehr möglich ist. 
+\end{itemize}
+\end{itemize}
+\uline{Beispiele:}\\\begin{tabular}{c}
+\hline
+\end{tabular}\\
+(+ 40 2)\\
+$\underset{eval_{id}}{\rightsquigarrow} (\#\langle$procedure:+$\rangle$ 40 2)\\
+$eval_{lit} \cdot 2$\\
+$\underset{apply prim}{\rightsquigarrow} 42 $\\
+\\\\\\
+(sqr 9)
+$\underset{eval_{id}}{\rightsquigarrow } (lambda (x) (* x x))$\\
+$eval_{lit}$\\
+$\underset{apply_\lambda}{\rightsquigarrow}$ ( * 9 9)\\
+$\underset{eval_{id}}{\rightsquigarrow}(\#\langle procedure:*\rangle $ 9 9)\\
+$eval_{lit *2}$\\
+$\underset{apply_{prim}}{\rightsquigarrow } 81$\\
 
 \end{document}
