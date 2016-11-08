@@ -276,5 +276,64 @@ $\underset{apply_\lambda}{\rightsquigarrow}$ ( * 9 9)\\
 $\underset{eval_{id}}{\rightsquigarrow}(\#\langle procedure:*\rangle $ 9 9)\\
 $eval_{lit *2}$\\
 $\underset{apply_{prim}}{\rightsquigarrow } 81$\\
+\subsubsection{Einschub: Lexikalische Bindung}
+Bezeichnen  (lambda (x) (* x x)) und (lambda (r) (* r r)) die gleiche Funktion?\\
+(... 9)$\overset{*}{\rightsquigarrow} 81$\\
+$\Rightarrow$ JA! \\
+\warningsign Das hat Einfluss auf das korrekte Einsetzten von Argumenten für Parameter ($s.apply_\lambda$).\\
+Das \uline{bindende Vorkommen} eines Identifiers $ \l2angle x\rangle$ im Programmtext kann systematisch bestimmt werden: Suche strikt "von innen nach außen" bis zum ersten\\
+(1) (lambda (x) ...)\\
+(2) (define x ...)\\
+Das ist das Prinzip der \uline{lexikalischen Bindung} (\warningsign Syntaxprüfung in DrRacket)
+\subsection{Übliche Notation in der Mathematik: \uline{Fallunterscheidung!}}
+maximum $(x_1,x_2)= \left(\begin{array}{c} x_1 \text{ falls } x_1 \geq x_2 \\ x_2\leftarrow \text{sonst} \end{array}\right)$\\
+\uline{Tests} (auch \uline{Prädikate}) sind Funktionen, die einen Wert der Signatur boolean liefern. Typische Primitive in Tests:\\
+\begin{lstlisting}[style=customc]
+(: = (number number -> boolean))
+(: < (real real -> boolean))
+(: string=? (string string -> boolean))
+(: boolean=? (boolean boolean ->boolean))
+(: zero? (number -> boolean))
+\end{lstlisting}
+Weiter: add?, even?, positive?, negative?, ...\\
 
+\subsection{Spezialform Fallunterscheidung (conditional)}
+
+(cond ($\langle t_1 \rangle \langle e_1 \rangle)\\
+(\langle t_2 \rangle \langle e_2 \rangle)\\
+...\\
+(\langle t_n \rangle \langle e_n \rangle)\\
+($else  $\langle e_{n+1} \rangle))$ <- optional
+\\
+Führt die Tests in der Reihenfolge $\langle t_1 \rangle, \langle t_2 \rangle$, ... durch. Sobald $\langle t_i\rangle$ zu \#t auswertet, werte Zweig $\langle e_i\rangle$ aus. $\langle e_i\rangle $ ist das Ergebnis der Fallunterscheidung. Wenn $\langle t_n\rangle$ \#f liefert, dann liefere \\
+$\left(\begin{array}{l}\text{Fehlermeldung " cond: alle Tests ergeben }\#f \text{falls kein else- Zweig, sonst}\\ \langle_{n+1}\rangle \end{array}\right)$
+
+Die Signatur \uline{one-of} lässt genau einen der n aufgezählten Werte zu:\\
+(one-of $\langle e_1\rangle \langle e_2\rangle$ ... $\langle e_n\rangle$ )
+\\
+Reduktion von cond [$eval_{cond}$]
+\begin{itemize}
+\item (cond ( $\langle t_1 \rangle$ $\langle e_1 \rangle$) ($\langle t_2 \rangle$ $\langle e_2 \rangle$ ) ...)
+\begin{itemize}
+\item[(1)] Reduziere $\langle t_1 \rangle$, erhalte $\langle t'_1 \rangle$
+\item[(2)] $\begin{array}{l} \langle e_1 \rangle \text{ falls } \langle t_1 \rangle = \#t\\
+(\text{cond } (\langle t_2 \rangle \langle e_2 \rangle)...)
+\end{array}$
+\end{itemize}
+\item (cond (else$\langle e_{n+1} \rangle$ )) $\rightsquigarrow \langle e_{n+1} \rangle$
+( $\langle t_1 \rangle$, $\langle e_2 \rangle$, ... sind \uline{nicht} ausgewertet\\
+sonst \\
+ $\langle e_1 \rangle$ nicht ausgewertet)
+\item (cond ) $\rightsquigarrow$ Fehler "cond alle Tests ergeben \#f
+
+\subsection{Binäre Fallentscheidung:}
+\begin{tabular}{rcc}
+
+(if  $\langle t_1 \rangle$  $\langle e_2 \rangle$ 	&		  & (cond ( $\langle t_1 \rangle$ \\
+$\langle e_3 \rangle$) 								&$\equiv$ &(else  $\langle e_2 \rangle$) \\
+$\langle e_1 \rangle$))								&		  & \\
+																	 
+																	 
+\end{tabular}
+\end{itemize}
 \end{document}
