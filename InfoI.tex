@@ -10,6 +10,7 @@
 \usepackage[table,xcdraw]{xcolor}
 \usepackage{graphicx}
 \usepackage{tikz}
+\usepackage{qtree}
 \usepackage{csquotes}
 \usepackage{fancyhdr}
 \usepackage{amssymb}
@@ -37,6 +38,7 @@ morecomment=[l]{//},
 morecomment=[s]{/*}{*/},
 morestring=[b]",
 }
+\lstset{escapeinside={*}{*},}
 
 \lstdefinestyle{customc}{
   belowcaptionskip=1\baselineskip,
@@ -142,7 +144,8 @@ Es erlaubt konsistente Wiederverwendung und dient der Selbstdokumentation von Pr
 \uline{Beispiel:} Euro $\rightarrow$ US-\$\\ \\
 \warningsign \uline{ Achtung:} Groß-/Kleinschreibung ist in Identifiern \underline{nicht} relevant.\\
 
-\subsection{Lambda-Abstraktion}Eine \uline{Lambda-Abstraktion} (auch: Funktion, Prozedur) erlaubt die Formulierung von Ausdrücken, in denen mittels \uline{Parametern} von konkreten Werten abstrahiert wird:
+\subsection{Lambda-Abstraktion}
+Eine \uline{Lambda-Abstraktion} (auch: Funktion, Prozedur) erlaubt die Formulierung von Ausdrücken, in denen mittels \uline{Parametern} von konkreten Werten abstrahiert wird:
 
 (lambda ($ \langle p_1\rangle \langle p_2\rangle...) \langle$expr$\rangle$)  \\
 expr ist der Rumpf und enthält Vorkommen der Paramenter $\langle p_i \rangle$. \\
@@ -281,7 +284,7 @@ Bezeichnen  (lambda (x) (* x x)) und (lambda (r) (* r r)) die gleiche Funktion?\
 (... 9)$\overset{*}{\rightsquigarrow} 81$\\
 $\Rightarrow$ JA! \\
 \warningsign Das hat Einfluss auf das korrekte Einsetzten von Argumenten für Parameter ($s.apply_\lambda$).\\
-Das \uline{bindende Vorkommen} eines Identifiers $ \l2angle x\rangle$ im Programmtext kann systematisch bestimmt werden: Suche strikt "von innen nach außen" bis zum ersten\\
+Das \uline{bindende Vorkommen} eines Identifiers $ \langle x\rangle$ im Programmtext kann systematisch bestimmt werden: Suche strikt "von innen nach außen" bis zum ersten\\
 (1) (lambda (x) ...)\\
 (2) (define x ...)\\
 Das ist das Prinzip der \uline{lexikalischen Bindung} (\warningsign Syntaxprüfung in DrRacket)
@@ -331,9 +334,186 @@ sonst \\
 
 (if  $\langle t_1 \rangle$  $\langle e_2 \rangle$ 	&		  & (cond ( $\langle t_1 \rangle$ \\
 $\langle e_3 \rangle$) 								&$\equiv$ &(else  $\langle e_2 \rangle$) \\
-$\langle e_1 \rangle$))								&		  & \\
-																	 
-																	 
+$\langle e_1 \rangle$))								&		  & \														 
 \end{tabular}
 \end{itemize}
+\subsection{Zusammengesetzte Daten}
+Daten können interessante intere Struktur (\uline{Komponenten}) aufweisen.\\
+\uline{Beispiel:} Ein Star Wars Charakter:\\
+
+\begin{tabular}{|c|l|}
+\hline
+name & "Luke Skywalker"\\
+\hline
+jedi? & \#f\\
+\hline
+force & 25\\
+\hline
+\end{tabular}
+\\\\
+\uline{Beispiel:}
+\begin{lstlisting}[style=customc]
+;Ein Charakter (character) besteht aus
+; - Name (name)
+; - Jedi-Status (jedi?)
+; - Staerke der Macht (force)
+(define-record-procedures character
+	make-charakter
+	character?
+	( character-name
+	  character-jedi?
+	  character-force))
+	  
+(make-character n j f) %*$\rightsquigarrow$ *) %*$\langle$*)Tabelle%*$\rangle$*)) Konstruktion
+(charcter-name *$\langle$*Tabelle*$\rangle$*) %*$\rightsquigarrow$*) n Selektor (komponenten auslesen)
+(character-jedi? %*$\langle$*)Tabelle%*$\rangle$*)) %*$\rightsquigarrow$*) j
+(character-force %*$\langle$*)Tabelle%*$\rangle$*)) %*$\rightsquigarrow$*) f
+\end{lstlisting}
+\subsection{\uline{Records} in Scheme}
+Record-Definition legst fest:
+\begin{itemize}
+\item Record-Signatur (Name)
+\item Konstruktor 		(bau aus komponenten einen Record)
+\item Prädikat 			(später)
+\item Liste von Selektoren (lesen je eine Komponente des Record)
+\end{itemize}
+(define-record-procedures $\langle t\rangle$        Signaturname\\
+	make-$\langle t \rangle$                        ;Konstruktor\\
+	$\langle t \rangle$? 							;Prädikat\\
+	($\langle t \rangle$-$\langle comp_1 \rangle$   ;Liste der Selektoren\\
+	 ...
+	 $\langle t \rangle$-$\langle comp_n \rangle$))\\
+Liste der Selektoren legt Komponenten (Anzahl, Reihenfolge, Namen) fest.
+Signatur des Konstruktors/der Selektoren für Record-Signatur $\langle t \rangle$ mit n Komponenten $\langle comp_1\rangle$ ...  $\langle comp_n\rangle$:\\
+(: make $\langle t \rangle$ ($\underset{\text{n Komponentensignaturen}}{\langle t \rangle}$ ... $\langle t_n \rangle$ $\rightarrow \langle t \rangle $))\\
+
+(: $ \langle t \rangle$-$\langle comp_1 \rangle$ ($ \langle t \rangle \rightarrow \langle t_1 \rangle$))\\\\
+$\forall$ string n, boolean j, natural f:\\
+(character-name (make-character n j f)) $\rightsquigarrow$ n \\
+(character-jedi? (make-character n j f)) $\rightsquigarrow$ j \\
+(character-force (make-character n j f)) $\rightsquigarrow$ f \\
+\\
+Aussagen üver die Interaktion von zwei (oder mehr) Funktionen: algebraische \uline{Eigenschaft}.\\
+
+\subsection{Spezialform check-property}
+(check-property 
+	(for-all(($\langle id_1\rangle \langle signatur_1\rangle$)
+			   ...
+			   ($\langle id_n\rangle \langle signatur_n\rangle$))
+		$\langle expr \rangle$)) expr ist das Prädikat,  das sich auf $\langle id_q\rangle$ ... $\langle id_n\rangle$ bezieht.
+		\\
+Test erfolgreich, falls $\langle expr \rangle$ für beliebige Bindungen für $\langle id_1 \rangle$ ... $\langle id_n\rangle$ \uline{immer} \#t ergibt.\\
+
+\subsubsection{Interaktion von Konstruktor und Selektor}
+(check-property
+	(for-all ((n string)
+			  (j boolean)
+			  (f natural)))
+	(string=? (character-name (make-character n j f)) n))\\
+
+\uline{Beispiel:} Die Summe zweier natürlicher Zahlen ist mindestens so groß wie jede dieser Zahlen. \\
+$\forall x_1,x_2 \in \mathbb{N}: x_1 +x_2 \geq max(x_1,x_2)$\\
+(check-property
+	(for-all (($x_1$ natural)\\
+			  ($x_2$ natural))\\
+	($\geq$(+ $x_1$ $x_2$) (max $x_2$ $x_2$))))\\
+	
+Konstruktion von Funktionen $\langle f \rangle$, doe zusammengesetzte Daten der Signatur $\langle t \rangle$ \uline{konsumiert}.\\
+\begin{itemize}
+\item Welchen Record-Komponenten $\langle comp_i \rangle$ sind relevant für $\langle f\rangle$?
+\item $\Rightarrow$ Schablone:\\
+(:$\langle f \rangle$ (... $\langle t \rangle$ ... $\rightarrow$ ...))\\
+(define $\langle$ f $\rangle$\\
+	(lambda (... r ...)\\
+		... ($\langle t\rangle$-$\langle comp_i\rangle$ r)...))\\
+(: not (boolean -> boolean))
+\end{itemize}
+Prozedur $\langle$f$\rangle$, die zusammengetzte Daten der Signatur $\langle$t$\rangle$ konstruiert/produziert.
+\begin{itemize}
+\item Konstruktoraufruf für $\langle$t$\rangle$ \uline{muss} enthalten sein!
+\begin{lstlisting}[style=customc]
+(:*$\langle$f$\rangle$* ( ... -> *$\langle$t$\rangle$*))
+ (define *$\langle$f$\rangle$*
+  (lambda (...)
+    (...(make-*$\langle$t$\rangle$* ...) ...))
+\end{lstlisting}
+\begin{figure} \Tree [ .lego-character [ .char [ .name ] [ .jedi? ][ .force ] ] [ .figure ] ]
+\end{figure}
+\end{itemize}
+\begin{tabular}{|c|c|}
+\hline
+&  \\
+char & \begin{tabular}{|c|c|}
+\hline
+name & \\
+jedi? & \\
+force & \\
+\hline
+\end{tabular}\\
+& \\
+\hline
+figure & (BILD)\\
+\hline
+\end{tabular}
+\subsection{Längen/Breitengrade}
+\begin{tabular}{lc}
+Breitengrade (latitude) & Längengrade (longitude) \\
+\begin{tikzpicture}
+\draw[red,thick] (0, 0)circle(1);
+\draw[dashed] (-1, 0) -- (1, 0);
+\draw[dashed] (-0.85, 0.5) -- (0.85, 0.5);
+\draw[dashed] (-0.85, -0.5) -- (0.85, -0.5);
+\draw[dashed] (1.3, 0.5) -- (1.3, 0.5) node[midway] {$+30^\circ$};
+\draw[dashed] (1.6, 0) -- (1.6, 0) node[midway] {$0^\circ$};
+\draw[dashed] (3, 0) -- (3, 0) node[midway] {Äquator};
+\draw[dashed] (1.3, -0.5) -- (1.3, -0.5) node[midway] {$-30^\circ$};
+\end{tikzpicture} &
+\begin{tikzpicture}
+\draw[red,thick] (0, 0)circle(1);
+\draw[dashed] (0, -1) -- (0, 1);
+\draw[dashed] (0.5, -0.85) -- (0.5, 0.85);
+\draw[dashed] (-0.5, 0.85) -- (-0.5, -0.85);
+\draw[dashed] (0, -1.3) -- (0, -1.3) node[midway] {$0^\circ$};
+\draw[dashed] (0.7, -1.23) -- (0.7, -1.23) node[midway] {$+30^\circ$};
+\draw[dashed] (-0.7, -1.23) -- (-0.7, -1.23) node[midway] {$-30^\circ$};
+\draw[dashed] (-1.35, 0) -- (-1.35, 0) node[midway] {$-180^\circ$};
+\draw[dashed] (1.35, 0) -- (1.35, 0) node[midway] {$+180^\circ$};
+\end{tikzpicture}\\	
+\end{tabular}
+\\
+\\
+Sei $\langle$p$\rangle$ ein Prädikat mit Signatur ( $\langle$t$\rangle$ $\rightarrow$ boolean).
+Eine Signatur
+\begin{lstlisting}[style=customc]
+(predicate *$\langle$p$\rangle$*)
+\end{lstlisting}
+gilt für jeden Wert x mit Signatur $\langle$t$\rangle$ für den zusätzlich (p$\langle$p$\rangle$ x)$\rightsquigarrow$ \#t gilt. Signatur (predicate $\langle$p$\rangle$) ist damit spezifischer  (restriktiver) als Signatur $\langle$t$\rangle$.
+
+\subsection{Signaturnamen}
+Einführung eines neuen Signaturnamens $\langle$new-t$\rangle$ für die Signatur $\langle$t$\rangle$:
+\begin{lstlisting}[style=customc]
+(define *$\langle$new-t$\rangle$* (signature *$\langle$t$\rangle$*))
+\end{lstlisting}
+\uline{Beispiele:}
+\begin{lstlisting}[style=customc]
+(define farbe
+ (signature (one-of "Karo" "Herz" "Pik" "Kreuz")))
+(define latitude
+ (signature (predicate latitude?)))
+\end{lstlisting}
+Übersetze eine Ortsangabe mittels Google Geocoding
+API in eine Position auf der Erdkugel:\\
+\begin{lstlisting}
+(:geocoder (string -> WHITESPACE    geocode WHITESPACE))
+\end{lstlisting}
+Ein geocode besteht aus... \textcolor{red}{TO BE CONTINUED}\\
+\begin{tabular}{ll}                    
+ &							\uline{Signatur}\\
+ Adresse (address)			&	string\\
+ Ortsangabe (loc)			&	location\\
+ Nordostecke (northeast)	&	location\\
+ Südwestecke (southwest)	&	location\\
+ Typ (type) 				&	string\\
+ Genauigkeit (accuracy) 	&	string\\
+\end{tabular}
 \end{document}
