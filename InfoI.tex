@@ -27,7 +27,11 @@
 \usetikzlibrary{trees,automata,arrows,shapes}
 \usetikzlibrary{shapes.geometric}
 \newcommand{\warningsign}{\tikz[baseline=-.75ex] \node[shape=regular polygon, regular polygon sides=3, inner sep=0pt, draw, thick] {\textbf{!}};}
- 
+\newcommand{\la}{$\langle$}
+\newcommand{\ra}{$\rangle$}
+%\newcommand{\anm}{$\langle  \rangle$}
+%\newcommand{\an}{$\langle$#1$\rangle$}
+
 %TODO: lstdefinelanguage auf DrRacket anpassen 
  
 \lstdefinelanguage{Dr}
@@ -503,10 +507,10 @@ Einführung eines neuen Signaturnamens $\langle$new-t$\rangle$ für die Signatur
 \end{lstlisting}
 Übersetze eine Ortsangabe mittels Google Geocoding
 API in eine Position auf der Erdkugel:\\
-\begin{lstlisting}
-(:geocoder (string -> WHITESPACE    geocode WHITESPACE))
+\begin{lstlisting}[style=customc]
+(:geocoder (string ->(mixed geocode geocode-))
 \end{lstlisting}
-Ein geocode besteht aus... \textcolor{red}{TO BE CONTINUED}\\
+Ein geocode besteht aus:\\
 \begin{tabular}{ll}                    
  &							\uline{Signatur}\\
  Adresse (address)			&	string\\
@@ -516,4 +520,141 @@ Ein geocode besteht aus... \textcolor{red}{TO BE CONTINUED}\\
  Typ (type) 				&	string\\
  Genauigkeit (accuracy) 	&	string\\
 \end{tabular}
+\section{Gemischte Daten}
+Die Signatur \uline{mixed}
+\begin{lstlisting}[style=customc]
+(mixed *$\langle t_1 \rangle$*...*$\langle t_n\rangle$*)
+\end{lstlisting}
+ist gültig für jeden Wert, der mindestens eine Signatur $\langle t_1 \rangle$ ... $\langle t_n\rangle$ erfüllt.\\
+Beispiel: Datendefinition:
+\begin{itemize}
+\item ein Geocode (Signatur geocode)
+\item eine Fehlermeldung (Signatur geocode-error)
+\end{itemize}
+\begin{lstlisting}[style=customc]
+(mixed geocode geocode-error)
+\end{lstlisting}
+Beispiel \begin{lstlisting}[style=customc]
+(eingebaute Funktion string -> number)
+(: string -> number (string -> mixed number (one-of #f)))
+\end{lstlisting}
+Das Prädikat \la t\ra? einer Record-Signatur \la t\ra  unterscheidet Werte der Signatur \la t\ra von \uline{allen anderen} Werten:\\
+\begin{lstlisting}[style=customc]
+(: *\la t \ra*? (any -> boolean))
+\end{lstlisting}
+\begin{tabular}{ll}
+Auch: & Prädikate für eingebaute Signaturen.\\
+ & number?, complex?, real?, rational?, integer?,\\ 
+ & natural?, string?, boolean?
+\end{tabular}
+Prozeduren, die gemischte Daten der Singatuen \la $t_1$\ra ... \la $t_n $ \ra konsumieren:
+\begin{lstlisting}[style=customc]
+(: * \la f\ra*(()mixed *\la$t_1$\ra ... \la $t_2$\ra*)-> ...))
+(define * \la f\ra*
+ (lambda (x)
+  (cond((*\la$t_1$\ra*? x)...)
+   ...
+   ((*\la$t_n$\ra*? x)...))))
+\end{lstlisting}
+Mittels \uline{let} lassen sich Werte an \uline{lokale Namen!} binden:
+\begin{lstlisting}[style=customc]
+(let ((*\la$id_1$\ra \la$e_2$\ra*) ... (*\la$id_n$\la \la$e_n$\ra)) e)
+\end{lstlisting}
+Die Ausdrücke \la $e_1$\ra ... \la$e_n$\ra werden parallel ausgewertet. 
+
+$\Rightarrow$ \la $id_1$\ra ... \la$id_n$\ra können in \la e\ra (und \uline{nur dort!}) verwendet werden.
+
+Der Wert des let-Ausdruck ist der Wert von e.
+"nur dort": Verwendung nur in in \la e\ra, nicht in den in \la $e_i$\ra!\\
+Lokal: Verwendung nicht außerhalb des (let...)\\
+\warningsign Sprachlevel "Die Macht der Abstraktion"
+\begin{lstlisting}[style=customc]
+(let   )*$\equiv$*(lambda ()  )
+\end{lstlisting}
+ \glqq Syntaktischer Zucker\grqq = Dinge die nett sind aber ersetzt werden können.\\
+\begin{lstlisting}[style=customc]
+(check-error *\la e\ra* *\la msg\ra)
+\end{lstlisting}
+erwartet Abbruch mit Fehlermeldung \la msg\ra. Erzwingen des Programmabbruches mittels (violation \la msg\ra)\\
+\subsection{Polymorphe Signaturen}
+Beobachtung: Manche Prozeduren arbeiten völlig unabhängig von den Signaturen ihrer Argumente:\\
+\uline{parametrisch polymorphe Prozeduren} (griechisch: vielgestaltig). Nutze \uline{Signaturvariablen}:\\
+Beispiele:
+\begin{lstlisting}[style=customc]
+;Identitaet
+(: id ( %a -> %a))
+(define id (lambda (x) x))
+
+;konstante Funktion (ignoriert zweites Argument)
+(: const( %a %b -> %a)) "Anstatt %b kann auch any benutzt werden"
+(define const
+ (lambda (x y) x))
+ 
+;Projektion (ein Argument auswaehlen) 
+(: proj ((one-of 1 2) %a %b -> (mixed %a %b)))
+(define proj 
+ (lambda (i x y)
+  (cond ((= i 1) x)
+        ((= i 2) y))))         
+\end{lstlisting}
+Beachte: Parametrisch polymorphe Prozeduren "wissen nichts" über ihre Argumente mit Signatur \%a, \%b, ... und können diese \uline{nur} reproduzieren oder an andere polymorphe Prozeduren weiterreichen.\\
+Eine polymorphe Signatur steht für die Signaturen, in denen die Signaturvariablen \uline{konistent} durch konkrete Signaturen ersetzt werden. \\\\
+Beispiel:
+
+Wenn eine Prozedur ( \%a number  \%b -> \%a) erfüllt, dann auch 
+
+(string number boolean -> string)
+
+(boolean number natural -> boolean)
+
+(string number string -> string)
+
+(number number number -> number)
+\newpage
+\subsection{Polymorphe Paare und Listen}
+\begin{lstlisting}[style=customc]
+; Ein polymorphes Paar (pair) besteht aus
+;- erster Komponente (first)
+;- zweite Komponente (rest)
+; wobei die komponenten jeweils beliebige Werte sind:
+
+(define record-procedures-parametric pair pair-of
+ make-pair
+ pair?
+ (first
+  rest))
+\end{lstlisting}
+\begin{lstlisting}
+(pair-of *\la $t_1$ \ra \la $t_2$ \ra*)
+\end{lstlisting}
+ist eine Signatur für Paare, deren erste und zweite Komponente von der Signatur \la $t_1$\ra bzw. \la $t_2$\ra sind.
+\begin{lstlisting}[style=customc]
+(: make-pair ( %a %b -> (pair-of %a %b)))
+(: first ((pair-of %a %b) -> %a))
+(: rest ((pair-of %a %b) -> %b))
+\end{lstlisting}
+\subsection{Liste}
+Eine \uline{Liste} von Werten der Signatur \la t\ra, (list-of \la t\ra), ist entweder
+\begin{itemize}
+\item leer (Signatur empty-list) oder
+\item ein Paar (Signatur pair-of) aus 
+\begin{itemize}
+\item einem Listenkopf (Signatur \la t \ra) und
+\item einer Restliste (Signatur (list-of \la t\ra)))
+\end{itemize}
+\end{itemize}
+\begin{lstlisting}[style=customc]
+(define list-of
+ (lambda (t)
+  (signature (mixed empty-list
+                    (pair-of t (list-of t))
+                                         ))))
+\end{lstlisting}
+(list-of \la t\ra). Listen, deren Elemente die Signatur \la t\ra besitzen.\\
+Die Signatur empty-list ist bereits in DrRacket vordefiniert. \\Ebenfalls vordefiniert ist:
+\begin{itemize}[-]
+\item (: empty empty-list)
+\item (: empty? (any -> boolean))
+\end{itemize}
+
 \end{document}
