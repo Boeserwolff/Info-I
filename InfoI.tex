@@ -656,5 +656,98 @@ Die Signatur empty-list ist bereits in DrRacket vordefiniert. \\Ebenfalls vordef
 \item (: empty empty-list)
 \item (: empty? (any -> boolean))
 \end{itemize}
+\subsection{Visualisierung von Listen}
+\begin{lstlisting}[style=customc]
+(make-pair 1 (make-pair 2 empty))
+\end{lstlisting}
+\begin{tabular}{lcl}
+lightning &
+\begin{tabular}{|c|c|}
+\hline & 
+\\ 
+1 & \begin{tabular}{|c|c|}
+\hline
+2 & empty \\
+\hline
+\end{tabular}\\ & \\
+\hline
+\end{tabular} & Notation skaliert schlecht
+\end{tabular}
+\subsection{Spines (Rückrad)}
+\begin{tikzpicture}[->,thick,level distance=1.5cm,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=3cm}]
+\node [rectangle,draw] (z){\ \ \ |\ \ \ \ }
+	child{node{The phantom menace}edge from parent[red] node[left,xshift=-5]{first}}
+	child{node[rectangle,draw] {\ \ \ |\ \ \ \ }
+		child{node{Attack of the Clones}edge from parent[red] node[left,xshift=-5]{first}}
+		child{node[rectangle,draw,color=black] {\ \ \ |\ \ \ \ }
+			child{node{Revenge of the Sith}edge from parent[red] node[left,xshift=-5]{first}}
+			child{node{empty}}edge from parent[green] node[left,xshift=30]{rest}}
+		edge from parent[green] node[left,xshift=30]{rest}};
+\end{tikzpicture}
+\\\\\\
+prequels+trilogy:\\
+\begin{tikzpicture}[->,thick,level distance=1.5cm,
+  level 1/.style={sibling distance=9cm},
+  level 2/.style={sibling distance=3cm}]
+\node [rectangle,draw] (z){\ \ \ |\ \ \ \ }
+	child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+		child{node{TPM}}
+		child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
+			child{node{AotC}}
+			child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
+				child{node{RotS}}
+				child{node{empty}}}}edge from parent[blue]}
+	child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+		child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+			child{node{ANH}}
+			child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
+				child{node{TESB}}
+					child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
+					child{node{RotJ}}
+					child{node{empty}}}}edge from parent[red]}
+		child{node{empty}}}
+	;
+\end{tikzpicture}
+\newpage
+
+\subsection{Prozeduren über Listen}
+Schablonen für gemischte und zusammengesetzte Daten\\
+\uline{Beispiel:}
+\begin{lstlisting}[style=customc]
+(: list-sum ((list-of number) -> number))
+
+(check-expect (list-sum empty) 0)
+(check-expect (list-sum (make-pair 40 (make-pair 2 empty))) 42)
+
+(define list-sum
+ (lambda (xs)
+  (cond ((empty? xs) 0)
+        ((pair?  xs) (+ (first xs) (list-sum (rest xs)))))))
+\end{lstlisting}
+Schablone für Funktion \la f\ra, die Liste xs konsumiert:
+\begin{lstlisting}[style=customc]
+(: *\la f\ra* ((list-of *\la $t_1$\ra*) -> *\la $t_2$\ra*))
+(define *\la f\ra*
+ (lambda (xs)
+  (cond ((empty? xs) ... )
+        ((pair?  xs) ... (first xs ) ... (*\la f\ra* (rest xs)) ....))))
+					    Signatur t_1			signatur t_2
+\end{lstlisting}
+
+\section{Neue Sprachebene "Macht der Abstraktion"}
+\begin{itemize}
+\item Signatur (list-of \%a) eingebaut 
+\item Neuer syntaktischer Zucker eingebaut: \\
+ (list \la$e_1$\ra \la$e_2$\ra ... \la$e_n$\ra)\\
+ $\equiv$\\
+ (m-p \la$e_1$\ra
+			 (m-p \la$e_2$\ra\\
+			 ...\\
+			 (m-p \la$e_n$ empty) ..))\\
+\item Ausgabeformat für nicht-leere Listen \\
+\#\la list \la$e_1$\ra \la$e_2$\ra ... \la$e_n$\ra\ra
+\end{itemize}
 
 \end{document}
