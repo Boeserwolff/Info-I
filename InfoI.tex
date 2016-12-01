@@ -575,11 +575,11 @@ Der Wert des let-Ausdruck ist der Wert von e.
 Lokal: Verwendung nicht außerhalb des (let...)\\
 \warningsign Sprachlevel "Die Macht der Abstraktion"
 \begin{lstlisting}[style=customc]
-(let   )*$\equiv$*(lambda ()  )
+(let   )§$\equiv$§(lambda ()  )
 \end{lstlisting}
  \glqq Syntaktischer Zucker\grqq = Dinge die nett sind aber ersetzt werden können.\\
 \begin{lstlisting}[style=customc]
-(check-error *\la e\ra* *\la msg\ra)
+(check-error §\la§e§\ra§ §\la§msg§\ra§)
 \end{lstlisting}
 erwartet Abbruch mit Fehlermeldung \la msg\ra. Erzwingen des Programmabbruches mittels (violation \la msg\ra)\\
 \subsection{Polymorphe Signaturen}
@@ -817,11 +817,11 @@ Konstuktoren:
    (+ n 1)))
 \end{lstlisting}
 Bedingte algebraische Eigenschaften (siehe check-property)
-$(=\Leftarrow$ \la p\ra \la e\ra)
+$(= $ $\Rightarrow$ \la p\ra \la e\ra)
 Nur, wenn \la p\ra $\rightsquigarrow$ \#t, wird der Ausdruck \la e\ra ausgewertet und getestet ob \la e\ra$\rightsquigarrow$\# t.\\
 \uline{Beispiel:} Fakultätsfunktion n! $(n\in \mathbb{N}):\\
 0!=1\\
-n! =n \cdot (n-1)! \equiv (sicc n)! = (succ n)!\cdot n!$
+n! =n \cdot (n-1)! \equiv ($succ $n)! = ($succ $n)!\cdot n!$
 \begin{center}
 $3! = 3 \cdot 2!$\\
 $	= 3 \cdot (2 \cdot 1!)$\\
