@@ -38,11 +38,11 @@
 {morekeywords={one,two,three,four,five,six,seven,eight,
 nine,ten,eleven,twelve,o,clock,rock,around,the,tonight},
 sensitive=false,
-morecomment=[l]{//},
+morecomment=[l]{;},
 morecomment=[s]{/*}{*/},
 morestring=[b]",
 }
-\lstset{escapeinside={*}{*},}
+\lstset{escapeinside={§}{§},}
 
 \lstdefinestyle{customc}{
   belowcaptionskip=1\baselineskip,
@@ -186,20 +186,26 @@ Bereits eingebundene Signaturen sind:
 \item image
 \end{itemize}
 
-\warningsign Der Doppelpunkt \enquote{ : } ist eine Spezialform und hat daher keinen Wert, aber einen Effekt: Eine Signaturprüfung wird durchgeführt.\\
+\warningsign Der Doppelpunkt \enquote{ : } ist eine Spezialform und hat daher keinen Wert, aber einen Effekt: Eine Signaturprüfung wird durchgeführt.
 
 \subsection{Prozedur-Signaturen}
-Prozedur-Signaturen spezifizieren Signaturen sowohl für die Parameter $\langle p_1 \rangle,\langle p_2\rangle$, ... als auch für den Ergebniswert der Prozedur:\\
-(:$\langle$id$\rangle$($\langle$signatur-$p_1\rangle$ $\langle$signatur-$p_2\rangle$ ... $\rightarrow \langle$signatur-ergebnis$\rangle$))\\
+Prozedur-Signaturen spezifizieren Signaturen sowohl für die Parameter $\langle p_1 \rangle,\langle p_2\rangle$, ... als auch für den Ergebniswert der Prozedur:
+\begin{lstlisting}[style=customc]
+(:§\la§id§\ra§ (§\la§signatur-§$p_1$\ra§ §\la§ signatur-§$p_2$\ra§ ... §$\rightarrow$§ §\la§signatur-ergebnis§\ra))
+\end{lstlisting}
 
-Prozedur-Signaturen werden bei \uline{jeder} Anwendung der Funktion $\langle$id$\rangle$ auf Verletzung geprüft.\\
+
+Prozedur-Signaturen werden bei \uline{jeder} Anwendung der Funktion $\langle$id$\rangle$ auf Verletzung geprüft.
 \subsection{Testfälle}
-\uline{Testfälle} dokumentieren das erwartende Ergebnis einer Prozedur für ausgewählte Argumente:\\
-(check-expect $\langle e_1\rangle$ $\langle e_2 \rangle$)\\
+\uline{Testfälle} dokumentieren das erwartende Ergebnis einer Prozedur für ausgewählte Argumente:
+\begin{lstlisting}[style=customc]
+(check-expect §\la$\text{e}_1$\ra§ \la$\text{e}_2$\ra)
+\end{lstlisting}
+%(check-expect $\langle e_1\rangle$ $\langle e_2 \rangle$)\\
 Werte den Ausdruck $\langle e_1\rangle$ aus und teste, ob der erhaltene Wert der Erwartung (=Wert des Ausdruck $\langle e_2 \rangle$) entspricht.\\
 Einer Prozedurdefinition sollten Testfälle direkt vorangestellt werden.\\
 \warningsign   \enquote{check-expect} ist eine Spezialform und hat daher keinen Wert. Eine Testverletztung wird als Effekt protokolliert.
-\subsection{Erinnerung}\uline{Konstruktionsanleitung für Prozeduren:}\\
+\subsection{Erinnerung}\uline{Konstruktionsanleitung für Prozeduren:}
 \begin{itemize}
 \item kurzbeschreibung (ein- bis zweizeiliger Kommentar mit Bezug auf PArameternamen und Ergebnis)
 \item Signatur (:$\langle$ name $\rangle$ (... $\rightarrow$))
@@ -368,10 +374,10 @@ force & 25\\
 	  character-jedi?
 	  character-force))
 	  
-(make-character n j f) %*$\rightsquigarrow$ *) %*$\langle$*)Tabelle%*$\rangle$*)) Konstruktion
-(charcter-name *$\langle$*Tabelle*$\rangle$*) %*$\rightsquigarrow$*) n Selektor (komponenten auslesen)
-(character-jedi? %*$\langle$*)Tabelle%*$\rangle$*)) %*$\rightsquigarrow$*) j
-(character-force %*$\langle$*)Tabelle%*$\rangle$*)) %*$\rightsquigarrow$*) f
+(make-character n j f) §$\rightsquigarrow$ §) §$\langle$§)Tabelle§$\rangle$§)) Konstruktion
+(charcter-name §$\langle$§Tabelle§$\rangle$§) §$\rightsquigarrow$§) n Selektor (komponenten auslesen)
+(character-jedi? §$\langle$§)Tabelle§$\rangle$§)) §$\rightsquigarrow$§) j
+(character-force §$\langle$§)Tabelle§$\rangle$§)) §$\rightsquigarrow$§) f
 \end{lstlisting}
 \subsection{\uline{Records} in Scheme}
 Record-Definition legst fest:
@@ -436,10 +442,10 @@ Prozedur $\langle$f$\rangle$, die zusammengetzte Daten der Signatur $\langle$t$\
 \begin{itemize}
 \item Konstruktoraufruf für $\langle$t$\rangle$ \uline{muss} enthalten sein!
 \begin{lstlisting}[style=customc]
-(:*$\langle$f$\rangle$* ( ... -> *$\langle$t$\rangle$*))
- (define *$\langle$f$\rangle$*
+(:§$\langle$§f§$\rangle$§ ( ... -> §$\langle$§t§$\rangle$§))
+ (define §$\langle$§f§$\rangle$§
   (lambda (...)
-    (...(make-*$\langle$t$\rangle$* ...) ...))
+    (...(make-§$\langle$§t§$\rangle$§ ...) ...))
 \end{lstlisting}
 \begin{figure} \Tree [ .lego-character [ .char [ .name ] [ .jedi? ][ .force ] ] [ .figure ] ]
 \end{figure}
@@ -489,14 +495,14 @@ Breitengrade (latitude) & Längengrade (longitude) \\
 Sei $\langle$p$\rangle$ ein Prädikat mit Signatur ( $\langle$t$\rangle$ $\rightarrow$ boolean).
 Eine Signatur
 \begin{lstlisting}[style=customc]
-(predicate *$\langle$p$\rangle$*)
+(predicate §$\langle$§p§$\rangle$§)
 \end{lstlisting}
 gilt für jeden Wert x mit Signatur $\langle$t$\rangle$ für den zusätzlich (p$\langle$p$\rangle$ x)$\rightsquigarrow$ \#t gilt. Signatur (predicate $\langle$p$\rangle$) ist damit spezifischer  (restriktiver) als Signatur $\langle$t$\rangle$.
 
 \subsection{Signaturnamen}
 Einführung eines neuen Signaturnamens $\langle$new-t$\rangle$ für die Signatur $\langle$t$\rangle$:
 \begin{lstlisting}[style=customc]
-(define *$\langle$new-t$\rangle$* (signature *$\langle$t$\rangle$*))
+(define §$\langle$§new-t§$\rangle$§ (signature §$\langle$§t§$\rangle$§))
 \end{lstlisting}
 \uline{Beispiele:}
 \begin{lstlisting}[style=customc]
@@ -523,7 +529,7 @@ Ein geocode besteht aus:\\
 \section{Gemischte Daten}
 Die Signatur \uline{mixed}
 \begin{lstlisting}[style=customc]
-(mixed *$\langle t_1 \rangle$*...*$\langle t_n\rangle$*)
+(mixed §$\langle t_1 \rangle$§...§$\langle t_n\rangle$§)
 \end{lstlisting}
 ist gültig für jeden Wert, der mindestens eine Signatur $\langle t_1 \rangle$ ... $\langle t_n\rangle$ erfüllt.\\
 Beispiel: Datendefinition:
@@ -540,7 +546,7 @@ Beispiel \begin{lstlisting}[style=customc]
 \end{lstlisting}
 Das Prädikat \la t\ra? einer Record-Signatur \la t\ra  unterscheidet Werte der Signatur \la t\ra von \uline{allen anderen} Werten:\\
 \begin{lstlisting}[style=customc]
-(: *\la t \ra*? (any -> boolean))
+(: §\la§t§\ra§? (any -> boolean))
 \end{lstlisting}
 \begin{tabular}{ll}
 Auch: & Prädikate für eingebaute Signaturen.\\
@@ -549,16 +555,16 @@ Auch: & Prädikate für eingebaute Signaturen.\\
 \end{tabular}
 Prozeduren, die gemischte Daten der Singatuen \la $t_1$\ra ... \la $t_n $ \ra konsumieren:
 \begin{lstlisting}[style=customc]
-(: * \la f\ra*(()mixed *\la$t_1$\ra ... \la $t_2$\ra*)-> ...))
-(define * \la f\ra*
+(: §\la§f§\ra§(()mixed §\la$t_1$\ra§ ... §\la $t_2$\ra§)-> ...))
+(define §\la§f§\ra§
  (lambda (x)
-  (cond((*\la$t_1$\ra*? x)...)
+  (cond((§\la$t_1$\ra§? x)...)
    ...
-   ((*\la$t_n$\ra*? x)...))))
+   ((§\la$t_n$\ra§? x)...))))
 \end{lstlisting}
 Mittels \uline{let} lassen sich Werte an \uline{lokale Namen!} binden:
 \begin{lstlisting}[style=customc]
-(let ((*\la$id_1$\ra \la$e_2$\ra*) ... (*\la$id_n$\la \la$e_n$\ra)) e)
+(let ((§\la$id_1$\ra§ §\la$e_2$\ra§) ... (§\la$id_n$\la§ §\la$e_n$\ra§)) e)
 \end{lstlisting}
 Die Ausdrücke \la $e_1$\ra ... \la$e_n$\ra werden parallel ausgewertet. 
 
@@ -624,8 +630,10 @@ Wenn eine Prozedur ( \%a number  \%b -> \%a) erfüllt, dann auch
  (first
   rest))
 \end{lstlisting}
+
+
 \begin{lstlisting}
-(pair-of *\la $t_1$ \ra \la $t_2$ \ra*)
+(pair-of §\la $t_1$ \ra \la $t_2$ \ra)
 \end{lstlisting}
 ist eine Signatur für Paare, deren erste und zweite Komponente von der Signatur \la $t_1$\ra bzw. \la $t_2$\ra sind.
 \begin{lstlisting}[style=customc]
@@ -710,6 +718,11 @@ prequels+trilogy:\\
 		child{node{empty}}}
 	;
 \end{tikzpicture}
+
+
+%Warum mache ich diesen Scheiß eigendlich? P.S.: Ich hasse Baumdiagramme 
+
+
 \newpage
 
 \subsection{Prozeduren über Listen}
@@ -728,11 +741,11 @@ Schablonen für gemischte und zusammengesetzte Daten\\
 \end{lstlisting}
 Schablone für Funktion \la f\ra, die Liste xs konsumiert:
 \begin{lstlisting}[style=customc]
-(: *\la f\ra* ((list-of *\la $t_1$\ra*) -> *\la $t_2$\ra*))
-(define *\la f\ra*
+(: §\la§f§\ra§ ((list-of §\la $t_1$\ra§) -> §\la $t_2$\ra§))
+(define §\la§f§\ra§
  (lambda (xs)
   (cond ((empty? xs) ... )
-        ((pair?  xs) ... (first xs ) ... (*\la f\ra* (rest xs)) ....))))
+        ((pair?  xs) ... (first xs) ... (§\la§f§\ra§ (rest xs)) ....))))
 					    Signatur t_1			signatur t_2
 \end{lstlisting}
 
@@ -749,5 +762,135 @@ Schablone für Funktion \la f\ra, die Liste xs konsumiert:
 \item Ausgabeformat für nicht-leere Listen \\
 \#\la list \la$e_1$\ra \la$e_2$\ra ... \la$e_n$\ra\ra
 \end{itemize}
+
+\subsection{cat}
+;Füge Listen xs, xy zusammen (con\uline{cat}enate)\\
+Zwei Fälle (xs leer oder nicht-leer)\\
+\begin{tabular}{lccc}
+1) & $\overset{xs}{empty}$ & $\overset{ys}{y_1 y_2 y_n}$  & $\overset{(cat xs xy)}{y_1 y_2 y_n}$\\
+2) &  $x_1 x_2 x_n$  &          $y_1 y_2 y_n$ &				$\underset{(cat (rest xs) ys)}{	\underset{rest xs}{x_1 x_2    x_n}    \underset{ys}{y_1 y_2   y_n}}$
+\end{tabular}
+
+\subsection{Bewertungen}
+\begin{itemize}
+\item Die Länge von xs (hier n) bestimmt die Anzahl der rekursiven Aufrufe.
+\item Auf ys werden keine Selektoren angewandt.
+
+\end{itemize}
+Spezialform \uline{match} vergleicht einen Wert \la e\ra mit gegebenen \uline{Patterns} \la $\text{pat}_1$\ra \la $\text{pat}_2$\ra, ... \la $\text{pat}_n$. Falls \la $\text{pat}_1$, $1 \leq i \leq n$, das erste Pattern ist, das auf \la e\ra  \uline{matchted}, ist Zweig \la $\text{e}_i$\ra das Ergebnis (ansonsten wird die Aiswertung mit "keiner der Zewige passte") abgegeben.
+\begin{lstlisting}[style=customc]
+(match §\la§e§\ra§
+ (§\la$\text{pat}_1$\ra§ §\la$e_1$\ra§)
+ (§\la$\text{pat}_2$\ra§ §\la$e_2$\ra§)
+ (§\la$\text{pat}_n$\ra§ §\la$e_n$\ra§))
+\end{lstlisting}
+
+\subsection{Pattern Matching für \la $\text{pat}_i$\ra}
+\begin{itemize}
+\item Literal \la l\ra:\\
+	\la e\ra matched, falls \la e\ra$\rightsquigarrow$\la l\ra
+\item "Don't care" \_ :\\
+	\la e\ra matched immer
+\item Variable \la v\ra\\
+	\la e\ra matched immer, danach ist \la v\ra an den Wert von \la e\ra n \la $\text{e}_i$\ra gebunden
+\item Record-Konstruktor (\la c\ra \la$\text{pat}_{i1}$\ra \la $\text{pat}_{ik}$), $k\geq \emptyset$\\
+	\la e\ra matched, wenn es durch (\la c\ra \la $\text{x}_1$\ra   \la $\text{x}_k$\ra) konstruiert wurde und \la$\text{x}_j$\ra auf \la$\text{pat}_{ij}$ matched, $1\leq j \leq k$
+\end{itemize}
+\warningsign Fall 4 ermöglicht Pattern Matching auf komplex konstuierten Werten.
+
+\subsection{Rekursion über natürliche Zahlen}
+Die natürlichen Zaglen (vgl. gemischte Daten).
+Eine natüliche Zahl (natural) ist entweder
+\begin{itemize}
+\item die 0 (zero)
+\item die Nachfolger (succ) einer natülichen Zahl
+\end{itemize}
+$\mathbb{N}$ = \{0, (succ 0), (succ (succ 0)), ...\}\\
+Konstuktoren:
+\begin{lstlisting}[style=customc]
+(: zero natural)
+(define zero 0)
+
+(: succ (natural -> natural))
+(define succ
+ (lambda (n)
+   (+ n 1)))
+\end{lstlisting}
+Bedingte algebraische Eigenschaften (siehe check-property)
+$(=\Leftarrow$ \la p\ra \la e\ra)
+Nur, wenn \la p\ra $\rightsquigarrow$ \#t, wird der Ausdruck \la e\ra ausgewertet und getestet ob \la e\ra$\rightsquigarrow$\# t.\\
+\uline{Beispiel:} Fakultätsfunktion n! $(n\in \mathbb{N}):\\
+0!=1\\
+n! =n \cdot (n-1)! \equiv (sicc n)! = (succ n)!\cdot n!$
+\begin{center}
+$3! = 3 \cdot 2!$\\
+$	= 3 \cdot (2 \cdot 1!)$\\
+$   = 3 \cdot (2 \cdot (1 \cdot 0 !))$\\
+$   = 3 \cdot (2 \cdot (1 \cdot 1))$\\
+$   = 6$\\
+$10!= 3628800$
+\end{center}
+\begin{lstlisting}[style=customc]
+; Berechne n!
+(: factorial (natural -> natural))
+(define factorial
+  (lambda (n)
+    (cond ((= n 0) ...
+          ((< n 0) (* (factorial (- n 1)) n))))))
+\end{lstlisting}
+Schablone für Funktionen \la f\ra, die natürliche Zahlen konsumieren.
+\begin{lstlisting}[style=customc]
+(: §\la§f§\ra§ (natural -> §\la§t§\ra§))
+(define §\la§f§\ra§
+  (lambda (n)
+    (cond ((= n 0) ...)
+		  ((> n 0) ... (§\la§f§\ra§ (- n 1) ... )))))
+\end{lstlisting}
+\uline{Satz:}\\
+Eine Funktion, die nach der Schablone für Listen oder natürliche zahlen geschrieben ist, \uline{terminiert immer}. (=liefert immer ein Ergebnis)\\
+Reduktion kann durchaus zur Konstruktion von Ausdrücken führen, die zunehmende Größe aufweisen (Für factorial bestimmt das Argument die Größe.)
+Wenn möglich, erzeuge Reduktionsprozesse, die \uline{konstanten Platzverbrauch} - unabhängig von Funktionsargumenten -benötigen.
+Beobachtung (Assoziativität von *)
+\begin{lstlisting}[style=customc]
+    (* 10 (* 9 (* 8 (* 7 (* 6 (factorial 5))))))
+=   (* (* (* (* (* 10 9) 8) 7) 6) (factorial 5))
+    (*         30240              (factorial 5))
+\end{lstlisting}
+$\Rightarrow$ Multiplikationen können vorgezogen werden.\\
+
+Idee: Führe Multiplikation jeweils sofort aus.
+Schleife des Zwischenergebnis (akkumulierendes Argument) durch die Berechnung. Am Ende enthält der Akkumulator das Endergebnis.\\
+Berechne 5!:\\
+\begin{lstlisting}[style=customc]
+(: fac-worker (natural natural -> natural))
+\end{lstlisting}
+\begin{center}
+\begin{tabular}{c|c}
+n & acc \\
+\hline
+5 & 1   \\
+4 & 5   \\
+3 & 20  \\
+2 & 60  \\
+1 & 120 \\
+0 & 120 \\
+\end{tabular}
+\end{center}
+\begin{lstlisting}[style=customc]
+(: fac-worker (natural natural -> natural))
+
+(define fac-worker
+  (lambda (n acc)
+    (cond ((= n 0) acc)
+		  ((> n 0) (fac-worker ( - n 1) (* acc n))))))
+\end{lstlisting}
+\begin{lstlisting}[style=customc]
+; Berechne n! [wrapper]
+(: fac (natural -> natural))
+(define fac
+  (lambda (n)
+    (fac-worker n 1)))
+    		  
+\end{lstlisting}
 
 \end{document}
