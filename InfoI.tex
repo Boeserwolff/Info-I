@@ -624,7 +624,7 @@ Wenn eine Prozedur ( \%a number  \%b -> \%a) erfüllt, dann auch
 ;- zweite Komponente (rest)
 ; wobei die komponenten jeweils beliebige Werte sind:
 
-(define record-procedures-parametric pair pair-of
+(define-record-procedures-parametric pair pair-of
  make-pair
  pair?
  (first
@@ -890,7 +890,70 @@ n & acc \\
 (define fac
   (lambda (n)
     (fac-worker n 1)))
-    		  
+    	
 \end{lstlisting}
+Ein Reduktionsprozess ist \uline{iterativ}, falls seine Größe konstant bleibt.\\
+\begin{tabular}{lll}
+Damit: & factorial & nicht iterativ \\
+ &		fac-worker & iterativ \\
+\end{tabular}\\
+
+Wieso ist fac-worker iterativ? Der rekursive Aufruf ersetzt den aktuell reduzierten Ausdruck \uline{vollständig}. Es gibt keinen \uline{Kontext} (umgebenden Ausdruck), der auf das Ergebnis des rekursiven Aufrufs "wartet".\\
+Kontext des rekursiven Aufrufes in
+\begin{itemize}
+\item factorial: (* n $\underset{Hole}{\qed}$)
+\item fac-worker: -keiner-
+\end{itemize}
+Ein Prozeduraufruf ist \uline{endrekursiv} (tail call), wenn er keinen Kontext besitzt.\\
+Prozeduren, die nur endrekursive Prozeduraufrufe enthalten, heißen selbst endrekursiv.\\
+Endrekursive Prozeduren führen zu iterativen Reduktionen. \\
+Beobachtung: Berechnung von (rev (from-to 1 1000)):
+
+\begin{lstlisting}[style=customc]
+(rev (from-to 1 1000))
+
+|.....1000 Aufrufe von make-pair....|
+(cat (list 1000 999 ... 2) (list 1))
+     |                   \
+     |                    |______________
+     |                                   |
+     (cat (list 1000 999 ... 3) (list 2))
+     |....999 Aufrufe von make-pair......|
+\end{lstlisting}
+$\Rightarrow$ Anzahl Aufrufe von make-pair 1000+999+998+...+1 auf einer Liste der Länge n:\\
+
+$\sum_{i=1}^{n} = \frac{1}{2} \cdot n \cdot (n+1)$ \hfil Quadratisch in n\\
+
+\subsubsection{iterative Listenumkehr (backwards)}
+Konstruiere iterative Listenumkehr (backwards)\\
+Berechnung von (backwards (list 1 2 3)).
+\begin{lstlisting}[style=customc]
+(: backwars-worker ((list-of %a) (list-of %a) -> (list-of %a)))
+\end{lstlisting}
+\begin{center}
+
+
+\begin{tabular}{rl|ll}
+&xs & acc& \\
+\hline
+&(list 1 2 3) & empty& \\
+rest &&& (make-pair 1 acc) \\
+&(list 2 3) & (list 1)& \\
+rest &&& (make-pair 2 acc) \\
+&(list 3) & (list 2 1)& \\
+rest &&& (make-pair 3 acc) \\
+& empty & (list 3 2 1) & \\
+\end{tabular}
+\end{center}
+linear viele Aufrufe von make-pair!\\
+\subsection{letrec}
+Mit \uline{letrec} lassen sich Werte an \uline{lokale Namen} binden:
+\begin{lstlisting}[style=customc]
+(letrec ((§\la$id_1$\ra \la e$_1$\ra§)
+	...
+         (§\la$id_n$\ra \la$e_n$\ra§))
+     §\la§e§\ra§)
+\end{lstlisting} 
+Die Ausdrücke \la$\text{e}_1$\ra...\la e$_n$\ra dürfen selbst auf die Namen \la $\text{id}_1$\ra ... \la$\text{id}_n$\ra beziegen. Den Wert des gesamten letrec-Ausdruck ist der Wert von \la e\ra.
 
 \end{document}
