@@ -955,5 +955,125 @@ Mit \uline{letrec} lassen sich Werte an \uline{lokale Namen} binden:
      §\la§e§\ra§)
 \end{lstlisting} 
 Die Ausdrücke \la$\text{e}_1$\ra...\la e$_n$\ra dürfen selbst auf die Namen \la $\text{id}_1$\ra ... \la$\text{id}_n$\ra beziegen. Den Wert des gesamten letrec-Ausdruck ist der Wert von \la e\ra.
+\subsection{Induktive Definitionen}
+Konstruktive Definition der natürlichen Zahlen $\mathbb{N}$:\\
+\uline{Def.} (Peano-Axiome)\\
+\begin{tabular}{ccc}
+(P1) & $ 0 \in \mathbb{N}$ & Null \\
+(P2) & $\forall n \in \mathbb{N}$:  succ(n)$\in\mathbb{N}$ & Nachfolger \\
+(P3) & $\forall n \in \mathbb{N}$:  succ(n)$\neq0$                     &    succ ist \\
+(P4) & $ \forall n,m \in \mathbb{N}: succ(m) =succ(n) \Leftarrow m = n$ &  injektiv (erzeugt neue Elemente)\\
+\end{tabular}\\
+(BILD TAFEL)\\
+\begin{tabular}{cl}
+($P_5$) & \uline{Induktionsaxiom:}\\
+ & Für jede Menge $M\subseteq \mathbb{N}$: \\
+ & Falls $0\in M$ und $\forall n : (n \in M \Rightarrow succ(n)\in M)$,\\
+ & dann M = $\mathbb{N}$. "$\mathbb{N}$ enthält nicht mehr als 0 und die durch succ () generierten Elemente." \\
+ & "Nichts sonst ist in $\mathbb{N}$" \\
+\end{tabular}
+
+\subsection{Beweisschema der vollständigen Induktion}
+Sei P(n) eine Eigenschaft einer Zahl $n \in \mathbb{N}$ (Prädikat):
+\begin{lstlisting}
+(: P (natural -> boolean))
+\end{lstlisting}
+\uline{Ziel:} Zeige $\forall n \in \mathbb{N}: P(n)$\\
+Definiere: $M:=\{n \in \mathbb{N}| P(n) \text{ gilt}\} \subseteq \mathbb{N}$ "M enthält alle n, für die P(n) gilt."\\
+\subsection{Induktionsaxiom (P5) für M}
+\begin{tabular}{l|l|}
+Falls \hfil & Falls \hfil \\
+$0 \in M$ & P(0) (INDUKTIONSBASIS)\\
+und & und \\
+$\forall n:(n \in M \Rightarrow succ(n)\in M)$ & $\forall n:(P(n)\Rightarrow P(succ(n)))$ (INDUKTIONSSCHRITT)\\
+dann & dann \\
+$M=\mathbb{N}$ & $\forall n \in \mathbb{N}:P(n)$
+\end{tabular}
+\subsubsection{Beispiel}
+\begin{tabular}{ll}
+1 & =1\\
+1+3 & =4\\
+1+3+5 & =9\\
+1+3+5+7 & = 16\\
+\end{tabular}\\
+$\underset{\text{Summe der ersten n+1 ungeraden natürlichen Zahlen}}{\sum_{i=0}^{n} (2i+1)} = (n+1)^2 \equiv P(n)$\\
+
+\uline{Zeige:} $\forall n \in \mathbb{N}: P(n)$
+\begin{itemize}
+\item[(1)] Induktionsbasis P(0)\\
+$\sum_{i=0}^{0} (2i+1) = 2\cdot 0 + 1 = 1 = (0+1)? $\checkmark \\
+\item[(2)] Induktionsschritt: $\forall n: (P(n) \Rightarrow P (n+1))$\\
+$\sum_{i=0}^{n+1} (2i+1) \underset{\sum}{=} \sum_{i=0}^{n} (2i+1) + 2(n+1)+1\\
+\underset{P(n)}{=} (n+1)^2 +2n+3\\
+= n^2 + 4n +4 \\
+= (n+2)^2 \checkmark $\\
+\end{itemize}
+\subsubsection{Beispiel}
+\begin{lstlisting}[style=customc]
+(define factorial
+  (lambda (k)
+      (if (= k 0) 1
+        (* k (factorial (- k 1))))))
+\end{lstlisting}
+$P(n)\equiv$ (factorial n) = \uline{n!} \hfil \uline{X}: Racket-Repräsentation der Zahl X\\
+
+Zeige : $\forall n\in \mathbb{N}: P(n)$
+\begin{itemize}
+\item[(1)] Induktionsbasis P(0)\\
+(factorial 0)
+$\rightsquigarrow$((lambda (k) ...) \uline{0})\\
+$\rightsquigarrow$ (if (= 0 0) 1 ...)\\
+$\rightsquigarrow$ (if \#t 1 ...)\\
+$\rightsquigarrow$ 1 = \uline{0!}
+\item[(2)] Induktionsschritt \\
+$\forall n : (P(n) \Rightarrow P(n+1)):$\\
+(factorial \uline{n+1})\\
+$\rightsquigarrow$ ((lambda (k) ...) \uline{n+1})\\
+$\rightsquigarrow$ (if (= \uline{n+1} 0)... (* ...))\\
+$\rightsquigarrow$ (if \#f ... (* ...))\\
+$\rightsquigarrow$ (* \uline{n+1} (factorial (- \uline{n+1} 1))) \hfil Annahme: - realisiert Differenz korrekt\\
+$\rightsquigarrow$ (* \uline{n+1} (factorial n)) \\
+\uline{P(n)} (* \uline{n+1} \uline{n!}) = (\uline{n+1})! \checkmark \hfil Annahme: + realisiert Multiplikation korrekt.
+\end{itemize}
+\subsubsection{Beispiel}
+Jedes f, das sich an die Schablone für Funktionen über natürlichen Zahlen hält, liefert immer ein Ergebnis (terminiert immer).\\
+Sei 
+\begin{lstlisting}[style=customc]
+(: f (natural -> %a ))
+\end{lstlisting} 
+also definiert durch:
+\begin{lstlisting}[style=customc]
+(define f
+  (lambda (n)
+    (if (= n 0)
+         basis
+         (step (f (- n 1)) n ))))
+\end{lstlisting}
+\subsubsection{Bemerkung}
+\begin{lstlisting}[style=customc]
+(: basis %a)
+(: step ( %a natural -> %a))       § \text{totale Funktion}§
+\end{lstlisting}
+Dann gilt:\\
+\begin{tabular}{ll}
+P(n)$\equiv$ & (f n) terminiert mit Ergebnis \\
+& der Signatur \%a
+\end{tabular}\\
+
+\uline{Beweis}\\
+\begin{itemize}
+\item[(1)] Induktionsbasis P(0)\\
+(f \uline{0})\\
+$\overset{*}{\rightsquigarrow}$ (if (= \uline{0} 0) basis ...)\\
+$\rightsquigarrow$ (if \#t basis)\\
+$\rightsquigarrow$ basis \checkmark\\
+\item[(2)] Induktionsschritt $\forall n:$(P(n) $\Rightarrow$ P(n+1))\\
+(f \uline{n+1})\\
+$\rightsquigarrow$ (if (= \uline{n+1} 0) ... (step...))\\
+$\rightsquigarrow$ (if \#f ... (step ...))\\
+$\rightsquigarrow$ (step (f (- \uline{n+1} 1)) \uline{n+1} )\\
+$\rightsquigarrow$ (step $\underset{\text{terminiert mit Ergebnis R}}{\text{(f \uline{n})}}$ \uline{n+1})\\
+$\overset{P(n)}{\rightsquigarrow}$ (step R \uline{n+1}) terminiert \checkmark\\
+\end{itemize}
 
 \end{document}
