@@ -1076,4 +1076,91 @@ $\rightsquigarrow$ (step $\underset{\text{terminiert mit Ergebnis R}}{\text{(f \
 $\overset{P(n)}{\rightsquigarrow}$ (step R \uline{n+1}) terminiert \checkmark\\
 \end{itemize}
 
+\subsection{\uline{Def} (Listen)}
+Die Menge M* (= Listen mit Elementen aus M, (list-of M)) ist \uline{induktiv} definiert:
+\begin{tabular}{ll}
+(l1) & empty $\in M*$\\
+(l2) & $\forall c \in M, xs \in M*)$: (make-pair x xs ) $\in M$\\
+(l3) & Nichts sonst ist in M*
+\end{tabular}
+\subsection{Schema der Listeninduktion}
+Sei P(xs) eine Eigenschaft von Listen über M:
+\begin{lstlisting}[style=customc]
+(: P ((list-of M) -> boolean))
+\end{lstlisting}
+
+Falls $\underset{\text{P(empty)}}{}$\\
+und $\underset{\forall x \in M, xs \in M*:\text{(P(xs)} \Rightarrow \text{ P((make-pair x xs)))}}{}$\\
+
+dann $\underset{\forall xs \in M* :\text{P(xs)}}{}$\\
+
+\uline{Beispiel:} Eigenschaften von cat (append).
+\begin{lstlisting}[style=customc]
+(define cat
+  (lambda (xs xs
+    (cond ((empty? xs) ys)
+          ((pair? xs) (make-pair (first xs)
+                                 (cat (rest xs) ys))))))
+\end{lstlisting}
+
+\begin{tabular}{lll}
+(1) & (cat empty ys) &= ys\\
+(2) & (cat xs empty) &= xs\\
+(3) & (cat (cat xs ys) zs) &= (cat xs (cat ys zs))\\
+    & "(M*, cat, empty) ist ein Monoid" & \\
+    & ($\mathbb{N}$, +, 0) &\\
+    & ($\mathbb{N}$, +, 1) & \\
+    
+\end{tabular}\\
+\uline{Beweise}
+\begin{itemize}
+\item[(1)] (cat empty ys) $\overset{*}{\rightsquigarrow}$ ys \checkmark \\
+\item[(2)] P(xs) $\equiv$ (cat xs empty) = xs\\
+
+Induktionsbasis P(empty): (cat empty empty) $\overset{(1)}{=}$ empty \checkmark\\
+Induktionsschritt $\forall x \in M, xs' \in M*$: (P(xs') $\Rightarrow$ P((make-pair x xs' )))\\
+(cat (make-pair x xs') empty)\\
+$\overset{*}{\rightsquigarrow}$ (make-pair)   (HIER FEHLT NOCH WAS)\\ %TODO        
+$\overset{*}{\rightsquigarrow}$ (make-pair x (cat xs' empty))\\
+$\overset{I.V.}{=}$ (make-pair x xs') \\
+\item[(3)] P(xs) $\equiv$ (cat (cat xs ys) zs) = (cat xs (cat ys zs))\\
+ys, zs $\in M*$ beliebig\\
+
+Induktionsbasis P(empty)
+(cat (cat empty ys) zs) \\
+$\overset{(1->)}{=}$ (cat ys zs)\\
+$\overset{(1<-)}{=}$ (cat empty (cat ys zs)) \checkmark\\
+
+Induktionsschritt $\forall x \in M, xs' \in M*$: (P(xs') $\Rightarrow$ P ((make-pair x xs'))) \\
+(cat (cat (make-pair x xs') ys) zs)\\
+$\overset{*}{=}$ (cat (make-pair x (cat xs' ys)) zs)\\
+$\overset{*}{\rightsquigarrow}$ (make-pair x (cat (cat xs' ys) zs))\\
+$\overset{I.V.}{=}$ (make-pair x (cat xs' (cat ys zs)))\\ 
+$\overset{*}{\rightsquigarrow}$ (cat (make-pair x xs') (cat ys) zs)) \checkmark \\
+\end{itemize}
+\uline{Beispiel:} Interaktion von length/cat
+\begin{lstlisting}[style=customc]
+(define length
+  (lambda (xs)
+    (cond ((empty? xs) 0)
+          ((pair? xs) (+1 (length (rest xs)))))))
+\end{lstlisting}
+ys $\in$ M* beliebig
+P(xs) $\equiv$ (length (cat xs ys)) = (+ (length xs )(length ys))
+
+Indultionsbasis P(empty) \\
+(length (cat emtpy) ys)) \\
+$\overset{(1)}{=}$ (length ys) \\
+$\overset{(+)}{=}$ (+ 0 (length ys)) \checkmark \\
+
+Induktionsschritt $\forall x \in M, xs' \in M*$: (P(xs') $\Rightarrow$ P ((make-pair x xs')))\\
+(length (cat (make-pair x xs') ys )) \\
+$\overset{*}{\rightsquigarrow}$ (length (make-pair x (cat xs' ys))) \\
+$\overset{*}{\rightsquigarrow}$ (+ 1 (length (rest (make-pair x (cat xs' ys))))) \\
+$\rightsquigarrow$ (+1 (length (cat xs' ys))) \\
+$\overset{I.V.}{=}$ (+1 (+ (length xs') (length ys))) \\
+$\overset{(+) Assoziativ}{=}$ (+ (+ 1 (length xs')) (length ys)) \\
+$\overset{*}{\rightsquigarrow}$ (+ (length (make-pair $\underset{\text{beliebig}}{\text{x}}$ xs')) (length ys))  \checkmark \\
+
+
 \end{document}
