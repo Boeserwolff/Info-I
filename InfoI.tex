@@ -1162,5 +1162,306 @@ $\overset{I.V.}{=}$ (+1 (+ (length xs') (length ys))) \\
 $\overset{(+) Assoziativ}{=}$ (+ (+ 1 (length xs')) (length ys)) \\
 $\overset{*}{\rightsquigarrow}$ (+ (length (make-pair $\underset{\text{beliebig}}{\text{x}}$ xs')) (length ys))  \checkmark \\
 
+\subsection{Prozeduren höherer Ordnung (HIGHER-ORDER FUNCTIONS)}
+Abstraktion von Funktionsparametern
+\begin{lstlisting}[style=customc]
+;Extrahiere die Elemente xs, die das Praedikat p? erfuellen
+
+(: filter (( %a -> boolean)(list-of %a) -> (list-of %a)))
+(define filter
+  (lambda (p? xs)
+    (cond ((empty? xs) empty)
+          ((pair? xs)(if (p? (first xs))
+                         (make-pair (first xs)
+                                    (filter p? (rest xs)))
+                         (filter p? (rest xs)))))))
+\end{lstlisting}
+\newpage
+
+Prozeduren höherer Ordnung (Higher-Order Procedures H.O.P)\\
+H.O.P. ...
+\begin{itemize}
+\item[(1)] akzeptieren Prozeduren als Parameter und/oder
+\item[(2)] liefern eine Prozedur als Ergebnis.
+\end{itemize}
+filter ist vom Typ (1)\\
+H.O.P. vermeiden Duplizierung von Code und führen zu
+\begin{itemize}
+\item kompakteren Programmieren
+\item verbesserte Lesbarkeit
+\item verbesserte Wartbarkeit
+\end{itemize}
+\subsubsection{Beispiel (map f xs)}
+BEISPIEL AUS VL
+\begin{lstlisting}[style=customc]
+; Wende f auf alle Elemente von xs an
+(: map (( %a -> %b)  (list-of %a) -> (list-of %b)))
+(define map
+  (lambda (f xs)
+    (cond ((empty? xs) empty)
+          ((pair? xs) (make-pair (f (fist xs)) (map f (rest xs)))))))
+\end{lstlisting}
+\subsubsection{Hinweis}
+Verwende einfache Lambda-Abstraktion direkt als \uline{anonyme} Funktion, wenn eine globale Benennung (via define) nicht gerechtfertigt erscheint (z.B. bei lokaler/einmaliger Benutzung).
+\subsubsection{Listenfaltung}
+Allgemeinere Transformation von Listen: \uline{Listenfaltung} (\uline{list folding}).\\
+Idee: die Listenkonstruktion make-pair und empty werden systematisch ersetzt:\\
+(SPINE NOTATION)\\
+(foldr z c xs) wirkt als Spine Transformer:
+\begin{itemize}
+\item empty $\rightarrow$ z
+\item make-pair $\rightarrow$ c
+\item Eingabe: Liste (list-of \%a)
+\item Ausgabe im allg. \uline{keine} Liste (etwa \%b)
+\end{itemize}
+\begin{lstlisting}[style=customc]
+;Falte Liste xs bzgl. c und z
+(: foldr ( %b (%a %b -> %b) (list-of %a)-> %b))
+(define foldr
+  (lambda (z c xs)
+    (cond ((empty? xs) z)
+          ((pair? xs) c (first xs) (foldr z c (rest xs))))))
+\end{lstlisting}
+\subsubsection{Beispiele (Reduktionen von xs )}
+(BEISPIELE AUS VL) 
+\begin{lstlisting}[style=customc]
+(: sum ((list-of number) -> number))
+(define sum
+  (lambda (xs) (foldr 0 + xs)))
+\end{lstlisting}
+Länge eine Liste durch Listenfaltung:
+(BEISPIEL AUS VL) 
+Spine-Transformation
+\begin{itemize}
+\item empty $\rightarrow$ 0
+\item (make-pair y ys) $\rightarrow$ (lambda y ys) (+1 ys)
+\end{itemize}
+\subsection{Universe}
+Teachpack universe nutzt H.O.P., um Animationen (=Sequenzen von Szenen/Bildern) zu definieren.
+\begin{lstlisting}[style=customc]
+(big-bang §\la$init$\ra§
+	(an-tick §\la§ tok§\ra§)
+	(to-draw §\la§render§\ra§ §\la§w§\ra§ §\la§h§\ra§))
+		   
+(: §\la§init§\ra§ %a)    	;Startzustand
+
+(: §\la§tock§\ra§ ( %a -> %a))	;Funktion, die neuen aus alten Zustand berechnet, wird 28 Mal/Sekunde aufgerufen 
+
+(: §\la§render§\ra§ ( %a -> image)) ;Funktion, die aus aktuellem Zustand eine Szene berechnet (wird in Fenster mit §\la§w§\ra§ x §\la§h§\ra§ Pixeln angezeigt)
+
+;Bei Schliessen der Animation wird der letzte aktuelle Zustand zurueckgegeben.
+
+\end{lstlisting}
+\subsection{Komposition von Funktionen (allgemein)}
+\begin{lstlisting}[style=customc]
+((compose f g) x) §$\equiv$§ (f (g x))
+\end{lstlisting}
+Mathematik: (compose f g) $\equiv f \circ g $ "f nach g" $\Rightarrow$ compose \uline{konstruiert} aus f und g eine \uline{neue Funktion} ("Funktionsfabrik")
+\begin{lstlisting}[style=customc]
+(: compose ((%b -> %c) ( %a -> %b) -> ( %a -> %c)))
+
+(define compose
+  (lamda f g)
+    (lambda (x)    ;Ergebnis ist eine
+      (f (g x))))) ;Funktion (nicht angewandt)
+\end{lstlisting}
+
+repeat: n-fache Komposition einer Funktion f mit sich selbst (n-fache Anwendung von f, Exponentiation)
+\begin{center}
+$f^0 = id$ (Identität id $\equiv$ (lambda (x) x))\\
+$f^n = f^{n-1} \circ f$
+\end{center}
+\begin{lstlisting}[style=customc]
+(: repeat (natural (%a-> %a) -> (%a -> %a)))
+
+(define repeat
+(lambda (n f)
+  (cond ((= n 0) (lambda (x) x))
+        ((> n 0) (compose (repeat (- n 1) f) f)))))
+        
+;Greife auf das n-te Element von xs zu (n>0)
+(: nth (natural (list-of %a) -> %a)) 
+
+(define nth
+  (lambda (n xs)
+    ((compose first (repeat (- n 1) rest)) xs)))        
+\end{lstlisting}
+
+(HIER KOMMT NOCH WAS (VL VON VOR DEN FERIEN))
+
+\subsection{Erinnerung}
+Bestimmung der ersten Ableitung der reellen Funktion f durch Bildung des \uline{Differenzenquotienten}:
+(Hier Bild mit x und y achse und schaubild) $\frac{f(x+h)-f(x)}{h}$ Differenzenquotient
+											$\lim\limits_{0} \frac{f(x+h)-f(x)}{h}=f'(x)$ Differentialquotient
+\begin{itemize}
+\item Operator ' (Ableitung) konsumiert funktion f ind produziert f' $\Rightarrow $ ' ist higher-order
+\end{itemize}
+
+\subsection{Streams (stream-of \% a)}
+\uline{unendliche} Ströme von Elementen $\text{x}_i$ der Signatur \%a.\\
+Ein Stream ist ein Paar 
+stream head (X1)     stream tail
+
+\tikz \node [rectangle,draw] {$x_1$ | tail} ;
+\%a (-> (stream-of \%a))
+
+\subsection{Vergleich}
+\begin{tabular} {ll}
+(list-of \%a) & (stream.of \%a) \\
+(BAUM A) & (BAUM B)
+\end{tabular}
+
+\subsubsection{Verzögerte Auswertung eines Ausdrucks (delayed evaluation)}
+\begin{itemize}
+\item \begin{lstlisting}[style=customc]
+(: delay ( %a -> (-> %a)))
+(delay §\la§e§\ra§) ;Verzoegere die Auswertung des Ausdrucks §\la§e§\ra§ und liefere "Versprechen" (promise) §\la§e§\ra§ bei Bedarf spaeter auswerten zu koennen.
+\end{lstlisting}
+\warningsign funktioniert nicht:
+\begin{lstlisting}[style=customc]
+(define delay
+  (lambda (e)
+    (lambda () e)))
+\end{lstlisting}
+\uline{Implementation:}
+\begin{lstlisting}[style=customc]
+(delay §\la§e§\ra§) §$\equiv$§ (lambda ()§\la§e§\ra§)
+\end{lstlisting}
+
+\item 
+\begin{lstlisting}[style=customc]
+(: force ((-> %a) -> %a))
+(force §\la§p§\ra§) ;Erzwinge Auswertung des Promise §\la§p§\ra§, liefere den Wert des verzoegerten Ausdrucks
+(define force 
+  (lambda (p)
+    (p)))
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Sieb des Erastostgenes (Generierung \uline{aller} Primzahlen)}
+Stream-Programm (über 2200 Jahre alt):
+\begin{itemize}
+\item Starte mit dem Stream str der Zahlen 2,3,4,...
+\item Die erste Zahl n in str ist eine Primzahl
+\item Streiche alle Vielfachen von n im Stream str
+\item weiter bei (2)
+\end{itemize}
+2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25\\
+\\
+\uline{2} 3  5  7  9  11 13 15 17 19 21 23 25\\
+\\
+\uline{2} \uline{3} 5 7 11 13 17 19 23 25\\
+\\
+\uline{2} \uline{3} \uline{5} 7 11 13 17 19 23\\
+
+\subsection{Binärbäume}
+Die Menge der \uline{Binärbäume} T(M) über M ist Induktiv definiert.
+\begin{itemize}
+\item[(T1)] empty-tree $\in$ T(M)
+\item[(T2)] $\forall x \in M$, l,r $\in T(M)$: (make-node l x r) $\in$ T(M)
+\item[(T3)] Nichts sonst ist in T(M)
+\end{itemize}
+Hinweise:
+\begin{itemize}
+\item Jeder Knoten (make-node) in einem Binärbaum hat zwei \uline{Teilbäume} l und r sowie eine \uline{Markierung} (\uline{Label}) $x \in M$.
+\item Vgl. M* und T(M), empty-list und empty-tree, make-pair und make-node.
+\end{itemize}
+
+\subsubsection{Visualisierung/Terminologie}
+\begin{itemize}
+\item empty-tree: \tikz \draw (-0.2,0.2) -- (0.2,0.2) -- (0.2,-0.2) -- (-0.2,-0.2) -- (-0.2,0.2);
+\item (make-node l x r):
+\begin{tikzpicture}
+\draw (0,0) circle [radius=0.2cm];
+\draw (-0.1,-0.1) -- (0.1,0.1);
+\draw (0.1,-0.1) -- (-0.1,0.1);
+\draw (0.2,0) -- (0.6,-0.5);
+\draw (0.6,-0.5) -- (0.35,-0.9) -- (0.8,-0.9) -- (0.6,-0.5);
+\draw (-0.2,0) -- (-0.6,-0.5);
+\draw (-0.6,-0.5) -- (-0.35,-0.9) -- (-0.8,-0.9) -- (-0.6,-0.5);
+\draw (-0.6,-0.74) node {l};
+\draw (0.6,-0.74) node {r};
+\end{tikzpicture}
+
+\item Der Knoten mit Markierung x ist \uline{Wurzel} (root) des Baumes
+\item Ein Knoten, der nur leere Teilbäume besitzt, heißt \uline{Blatt} (\uline{leaf}) Alle anderen Knoten sind \uline{innere Knoten} (inner nodes)
+
+\begin{tikzpicture}[thick,level distance=1.2cm]
+\node [circle,draw] {Blatt}
+					child{node[rectangle,draw]{}}
+					child{node[rectangle,draw]{}};					
+\draw (5,0) node [circle,draw] {1} child {node[circle,draw] {2} child{node [rectangle,draw]{}}
+child{node [rectangle,draw]{}}}
+child {node[circle,draw] {3} child{node [rectangle,draw]{}}
+child{node [rectangle,draw]{}}};
+
+\draw (7,0) node{innerer Knoten};
+
+\end{tikzpicture}
+
+\end{itemize}
+
+Beispiel für Binärbäume der Menge T($\mathbb{N}$).
+\begin{itemize}
+\item Baum $t_1$: listenartig (rechtstief)
+
+\begin{tikzpicture}[thick,level distance=1.2cm,level 2/.style={sibling distance=1cm}]
+\node [circle,draw] {1}
+	child{node[rectangle,draw]{}}
+	child{node[circle,draw]{2}
+			child{node[rectangle,draw]{}}
+			child{node[circle,draw]{3}
+					child{node[rectangle,draw]{}}
+					child{node[rectangle,draw]{}}}};
+\draw (5,0) node {Knoten mit Label 1 ist \uline{Wurzel}};
+\draw (5,-1.2) node {Knoten 1,2 sind \uline{innere Knoten}};
+\draw (5,-2.4) node {Knoten 3 ist \uline{Blatt} };	
+\end{tikzpicture}
+\item Baum $t_2$: balanciert
+
+\begin{tikzpicture}[thick,level distance=1.2cm,level 2/.style={sibling distance=1cm}]
+\node [circle,draw] {1}
+child{node[circle,draw] {2}
+child{node[rectangle,draw]{}}
+child{node[rectangle,draw]{}}}
+child{node[circle,draw] {3}
+child{node[rectangle,draw]{}}
+child{node[rectangle,draw]{}}};
+					
+					
+\draw (5,0) node {Knoten 1 ist \uline{Wurzel} und \uline{innerer Knoten}};
+\draw (5,-1.2) node {Knoten 2,3 sind Blätter};	
+\end{tikzpicture}
+\end{itemize}
+(Binär-)Bäume haben zahllose Anwendungen:
+\begin{itemize}
+\item Suchbäume (schneller Zugriff, z.B. in Datenbanksystemen)
+\item Datenkompression
+\item Darstellung von Programmen/Ausdrücken im Rechner
+\item ...
+\end{itemize}
+Bäume sind \colorbox{red}{DIE} induktive Datenstruktur in der Informatik.
+
+Die \uline{Tiefe} (\uline{depth}) eines Binärbaumes t ist die maximale Länge eines Weges von der Wurzel bis zu einem leeren Teilbaum. Also: 
+\begin{lstlisting}
+(btree-depth empty-tree)  = 0
+(btree-depth t2)          = 2
+(btree-depth t3)          = 3
+(btree-depth classifier)  = 4
+\end{lstlisting}
+
+Schablone (gemischte + zusammengesetzte Daten):
+\begin{lstlisting}[style=customc]
+(: btree-depth ((btree-of %a) -> natural))
+
+(define btree-depth
+  (lambda (t)
+    (cond ((empty-tree? t) 0)
+          ((node? t) (+ 1 (max (btree-depth (node-left-branch t))
+                               (btree-depth (node-right-branch t))
+                     ))))))
+\end{lstlisting}
+
+
 
 \end{document}
