@@ -1192,7 +1192,25 @@ H.O.P. vermeiden Duplizierung von Code und führen zu
 \item verbesserte Wartbarkeit
 \end{itemize}
 \subsubsection{Beispiel (map f xs)}
-BEISPIEL AUS VL
+\begin{tikzpicture}[thick]
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{$x_2$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\draw (4, -2) node {$\rightsquigarrow$ map (f xs) $\rightsquigarrow$};
+\draw (7,0) node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{(f $x_1$)}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{(f $x_2$)}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{(f $x_n$)}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\end{tikzpicture}
 \begin{lstlisting}[style=customc]
 ; Wende f auf alle Elemente von xs an
 (: map (( %a -> %b)  (list-of %a) -> (list-of %b)))
@@ -1206,7 +1224,26 @@ Verwende einfache Lambda-Abstraktion direkt als \uline{anonyme} Funktion, wenn e
 \subsubsection{Listenfaltung}
 Allgemeinere Transformation von Listen: \uline{Listenfaltung} (\uline{list folding}).\\
 Idee: die Listenkonstruktion make-pair und empty werden systematisch ersetzt:\\
-(SPINE NOTATION)\\
+\begin{tikzpicture}[thick]
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{$x_2$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\draw (4, -2) node {$\rightsquigarrow$ (foldr z c xs) $\rightsquigarrow$};
+\draw (7,0) node  {c}
+child{node{$x_1$}}
+child{node{c}
+child{node{$x_2$}}
+child{node{c}edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{z}edge from parent[solid]}
+}};
+\end{tikzpicture}
+
 (foldr z c xs) wirkt als Spine Transformer:
 \begin{itemize}
 \item empty $\rightarrow$ z
@@ -1223,14 +1260,59 @@ Idee: die Listenkonstruktion make-pair und empty werden systematisch ersetzt:\\
           ((pair? xs) c (first xs) (foldr z c (rest xs))))))
 \end{lstlisting}
 \subsubsection{Beispiele (Reduktionen von xs )}
-(BEISPIELE AUS VL) 
+\begin{tikzpicture}[thick]
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{$x_2$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\draw (4, -2) node {$\rightsquigarrow$ (foldr 0 + xs) $\rightsquigarrow$};
+\draw (7,0) node  {+}
+child{node{$x_1$}}
+child{node{+}
+child{node{$x_2$}}
+child{node{+}edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{0}edge from parent[solid]}
+}};
+\draw (-3, -2) node {$\leftarrow$ (foldr 1 * xs) $\leftarrow$};
+\draw (-6,0) node  {*}
+child{node{$x_1$}}
+child{node{*}
+child{node{$x_2$}}
+child{node{*}edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{1}edge from parent[solid]}
+}};
+\end{tikzpicture}
 \begin{lstlisting}[style=customc]
 (: sum ((list-of number) -> number))
 (define sum
   (lambda (xs) (foldr 0 + xs)))
 \end{lstlisting}
-Länge eine Liste durch Listenfaltung:
-(BEISPIEL AUS VL) 
+Länge eine Liste durch Listenfaltung:\\
+\begin{tikzpicture}[thick]
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{$x_2$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\draw (4, -2) node {$\rightsquigarrow$ (foldr z c xs) $\rightsquigarrow$};
+\draw (7,0) node  {+}
+child{node{1}}
+child{node{+}
+child{node{1}}
+child{node{+}edge from parent[densely dashed]
+child{node{1}edge from parent[solid]}
+child{node{0}edge from parent[solid]}
+}};
+\end{tikzpicture}\\
 Spine-Transformation
 \begin{itemize}
 \item empty $\rightarrow$ 0
@@ -1287,7 +1369,57 @@ $f^n = f^{n-1} \circ f$
     ((compose first (repeat (- n 1) rest)) xs)))        
 \end{lstlisting}
 
-(HIER KOMMT NOCH WAS (VL VON VOR DEN FERIEN))
+\subsection{Currying}
+Reduktion von ((add 1) 41)\\\\
+$\overset{\text{eval id}}{\rightsquigarrow}$ ((lambda (x)(lambda (y) (+ x y))) 1 41)\\
+$\overset{\text{apply }\lambda}{\rightsquigarrow}$ ((lambda (y) (+ 1 y)) 41)\\
+$\overset{\text{apply }\lambda}{\rightsquigarrow}$ (+ 1 41) $\rightsquigarrow$ 42\\
+\\
+\begin{tikzpicture}
+\draw (0,0) node {(\%a \%b $\rightarrow$ \%c)};
+\draw (0.4,-1.5) node {(\%a $\rightarrow$ (\%b $\rightarrow$ \%c))};
+\draw [thick,->,red] (-1,-0.3) -- (-1,-1) node [right,midway] {curry};
+\draw [thick,<-,red] (0.6,-0.3) -- (0.6,-1) node [right,midway] {uncurry}; 
+\draw [->](2.5,0) -- (7,0) node[above,midway] {Anwendung auf zwei} node [below,midway] {Argumente \%a \%b} node [right] {\%c};
+\draw [->](2.5,-1.5) -- (6,-1.5) node[above,midway] {Anwendung auf ein} node [below,midway] {Argument \%a} node [right] {(\%b$\rightarrow$\%c)};
+\draw [->](8.2,-1.5) -- (12,-1.5)node[above,midway] {Anwendung auf ein}node [below,midway] {Argument \%b} node [right] {\%c};
+\draw (2.5,-2.3) .. controls (2.5,-3) and (6,-3) .. (6,-2.3) node [below,midway] {partielle Applikation};
+\draw [thick,blue,->](8,0) -- (12.5,-0.5);
+\draw [thick,blue,->](13,-1.5) -- (13.3,-1.1);
+\draw (14,-0.5) node {Schönfinkel} node [below] {Isomprphismus};
+\end{tikzpicture}
+\\
+\begin{itemize}
+\item Currying (Haskell B. Curry, Moses Schönfinkel)
+
+Anwendung einer Funktion auf ihr erstes Argument liefert eine Funktion der restlichen Argumente.
+\item Jede n-stellige Funktion lässt sich in eine alternative curried Variante transformieren, die in n Schritten jeweils nur ein Argument \\konsumiert: \ \ \ \ \ curry (Transformator)\\ Gegenrichtung: uncurry
+\end{itemize}
+\begin{lstlisting}[style=customc]
+(: curry (( %a %b -> %c) -> ( %a ->( %b -> %c))))
+
+(define curry
+  (lambda (f)
+    (lambda (x)    ;neue
+      (lambda (y)  ;Funktion
+        (f x y)    ;
+      )
+    )
+  )
+)
+\end{lstlisting}
+
+\begin{lstlisting}[style=customc]
+(: uncurry ((%a -> (%b -> %c)) -> (%a %b -> %c)))
+
+(define uncurry
+  (lambda (f)
+    (lambda (x y)    
+      ((f x) y)     
+      )
+    )
+  )
+\end{lstlisting}
 
 \subsection{Erinnerung}
 Bestimmung der ersten Ableitung der reellen Funktion f durch Bildung des \uline{Differenzenquotienten}:
@@ -1308,7 +1440,24 @@ stream head (X1)     stream tail
 \subsection{Vergleich}
 \begin{tabular} {ll}
 (list-of \%a) & (stream.of \%a) \\
-(BAUM A) & (BAUM B)
+\begin{tikzpicture}[thick]
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{$x_2$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\end{tikzpicture} &
+\begin{tikzpicture}
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ $\lambda$  }
+child{node{$x_2$}}
+child[missing]};
+\end{tikzpicture}
+
 \end{tabular}
 
 \subsubsection{Verzögerte Auswertung eines Ausdrucks (delayed evaluation)}
@@ -1462,6 +1611,112 @@ Schablone (gemischte + zusammengesetzte Daten):
                      ))))))
 \end{lstlisting}
 
+\subsubsection{Einschub: Pretty-Printing von Binärbäumen}
+Prozedur (pp \la t\ra) erzeugt formatierten String für Binärbaum \la t\ra.
+\begin{lstlisting}[style=customc]
+(pp §\qed§) = (list "§\qed§")                                          §\hfil§§\hfil§
+(pp §\begin{tikzpicture}
+\draw (0,0) circle [radius=0.2cm];
+\draw (-0.1,-0.1) -- (0.1,0.1);
+\draw (0.1,-0.1) -- (-0.1,0.1);
+\draw (0.2,0) -- (0.6,-0.5);
+\draw (0.6,-0.5) -- (0.35,-0.9) -- (0.8,-0.9) -- (0.6,-0.5);
+\draw (-0.2,0) -- (-0.6,-0.5);
+\draw (-0.6,-0.5) -- (-0.35,-0.9) -- (-0.8,-0.9) -- (-0.6,-0.5);
+\draw (-0.6,-0.74) node {l};
+\draw (0.6,-0.74) node {r};
+\end{tikzpicture}§) = x
+\end{lstlisting}
 
+Idee: Repräsentiere formatierten String als \uline{Liste von Zeichen (String):}
+\begin{itemize}
+\item[(1)] Nutze (string-append ...) um Zeilen-Strings zu definieren [horizontal]
+\item[(2)] Nutze (append... ) um die einzelnen Zeilen zu einer Liste von Zeilen zusammenzusetzen [vertikal]
+\end{itemize}
+Erst direkt vor der Ausgabe werden die Zeilen-Strings zu einem auszugebendem String zusammengesetzt.
+\begin{lstlisting}[style=customc]
+(strings-list->string)
+\end{lstlisting}
+\subsection{Induktion über Binärbäumen}
+Sei $P(t)$ eine Eigenschaft von Binärbäumen $t\in T(M)$, also (: P ((btree-of M) -> boolean)).
 
+Falls\\
+     P(empty-tree) [Induktionsbeweis]\\
+und \\
+    $\forall x \in M$,$l\in T(M)$, $r \in T(M)$:\\
+    $P(l)\land P(r) \Rightarrow $P((make-node l x r))\\
+dann $\forall t \in T(M) P(t).$
+
+\subsubsection{Beispiel:}
+Zusammenhang zwischen Größe (btree-size) und Tiefe (btree-depth) eines Binärbaums t:\\
+$P(t)\equiv (btree-depth t) \leq (btree-size t) \leq 2^{(btree-depth t)}-1$
+
+\uline{Induktionsbasis P(empty-tree):}\\
+(size empty-tree)
+$\rightsquigarrow$ 0 $=2^0-1$ $\rightsquigarrow 2^{(depth empty-tree)}-1$ \checkmark
+
+\uline{Induktionsschritt}
+$P(l) \land P(r) \rightarrow P((make-node l x r))$\\
+ (size (make-node l x r))
+$\rightsquigarrow$ (size l) + 1+ 1 (size r)
+$\leq 2^{(depth l)}-1+1+2^{(depth r)}-1$\\
+$= 2^(depth l)+2^{(swpth r)} -1$\\
+$\leq 2 \cdot max ( 2^{(depth l)},2^{(depth r)})-1$\\
+$=2\cdot 2^{max((depth l),(depth r))}-1$\\
+$=2^{1+max((depth l),(depth r))}-1$\\
+$\rightsquigarrow 2^{(depth (make-node l x r))}+1$\\
+
+\subsubsection{Erinnerung}
+fold ist Spine-Transformer für Listen xs:\\
+\begin{tikzpicture}[thick]
+\node [rectangle,draw] {\ \ \ |\ \ \ \ }
+child{node{$x_1$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+child{node{$x_2$}}
+child{node[rectangle,draw]{\ \ \ |\ \ \ \ }edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{empty}edge from parent[solid]}
+}};
+\draw (4, -2) node {$\rightsquigarrow$ (foldr z c xs) $\rightsquigarrow$};
+\draw (7,0) node  {c}
+child{node{$x_1$}}
+child{node{c}
+child{node{$x_2$}}
+child{node{c}edge from parent[densely dashed]
+child{node{$x_n$}edge from parent[solid]}
+child{node{z}edge from parent[solid]}
+}};
+\end{tikzpicture}\\
+Wie müsste btree-fold, eine fold-Operation für Binärbäume, verhalten? Tree-Transformer für Bäume t:\\
+\begin{tikzpicture}[thick,level distance=1.2cm,level 2/.style={sibling distance=1cm},level 1/.style={sibling distance=2cm}]
+\node [circle,draw] {1}
+child{node[circle,draw] {2}
+child{node[rectangle,draw]{}}
+child{node[rectangle,draw]{}}}
+child{node[circle,draw] {3}
+child{node[rectangle,draw]{}}
+child{node[rectangle,draw]{}}};
+					
+\draw (3.5,-1.2) node {$\rightsquigarrow$ (btree-fold z c t) $\rightsquigarrow$};	
+\draw (7.5,0) node {(c . $x_1$ .)}
+child{node {(c . $x_2$ .)}
+child{node{z}}
+child{node{z}}}
+child{node {(c . $x_3$ .)}
+child{node{z}}
+child{node{z}}};
+\end{tikzpicture}
+\begin{lstlisting}[style=customc]
+;Falte Baum bzgl. z und c
+
+(: btree-fold ( %b (%b %a %b -> b)(btree-of %a) -> %b))
+
+(define btree-fold
+  (lambda (z c t)
+    (cond ((empty-tree? t) z)
+          ((node? t)  (c (btree-fold z c (node-left.branch t))
+                         (node-label t)
+                         (btree-fold z c (node-right-branch t)))))))
+\end{lstlisting}
+    
 \end{document}
