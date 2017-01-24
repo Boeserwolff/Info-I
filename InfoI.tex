@@ -1217,7 +1217,7 @@ child{node{empty}edge from parent[solid]}
 (define map
   (lambda (f xs)
     (cond ((empty? xs) empty)
-          ((pair? xs) (make-pair (f (fist xs)) (map f (rest xs)))))))
+          ((pair? xs) (make-pair (f (first xs)) (map f (rest xs)))))))
 \end{lstlisting}
 \subsubsection{Hinweis}
 Verwende einfache Lambda-Abstraktion direkt als \uline{anonyme} Funktion, wenn eine globale Benennung (via define) nicht gerechtfertigt erscheint (z.B. bei lokaler/einmaliger Benutzung).
@@ -1257,7 +1257,7 @@ child{node{z}edge from parent[solid]}
 (define foldr
   (lambda (z c xs)
     (cond ((empty? xs) z)
-          ((pair? xs) c (first xs) (foldr z c (rest xs))))))
+          ((pair? xs) (c (first xs) (foldr z c (rest xs)))))))
 \end{lstlisting}
 \subsubsection{Beispiele (Reduktionen von xs )}
 \begin{tikzpicture}[thick]
@@ -1801,10 +1801,10 @@ t$\equiv$
   child{node[rectangle,draw]{}}
   child{node[rectangle,draw]{}}}}
  child{node[circle,draw] {h}
- child{node[circle,draw] {3}
+ child{node[circle,draw] {m}
  child{node[rectangle,draw]{}}
  child{node[rectangle,draw]{}}}
-  child{node[circle,draw] {4}
+  child{node[circle,draw] {e}
   child{node[rectangle,draw]{}}
   child{node[rectangle,draw]{}}}};
 \draw [orange,thick](-2.5,-.5) -- (3,-.5) node [right,above] {Ebenen};
@@ -1815,5 +1815,139 @@ t$\equiv$
 \begin{lstlisting}[style=customc]
 (leveloder t) = (list "s" "c" "h" "e" "m" "e")
 \end{lstlisting}
+Idee: Gegeben sei eine Liste ts von Bäumen
+\begin{itemize}
+\item[(1)] Sammle die Liste der Markierungen der Wurzeln der (nicht-leeren) Bäume n ts (= (roots ts))
+\item[(2)] Bestimme die Liste ts' der Teilbäume der (nicht-leeren) Bäume n ts (= (subtrees ts))
+\item[(3)] Führe (1) rekursiv auf ts' aus.
+\item[(4)] komkatiniere die Listen aus (1) und (3).
+\end{itemize}    
+\uline{Zu Beginn}\\
+ \begin{tikzpicture}[thick,level distance=1.2cm,level 2/.style={sibling distance=1.5cm},level 1/.style={sibling distance=3cm},level 3/.style={sibling distance=0.75cm}]
+ \node [circle,draw] {s}
+ child{node[circle,draw] {c}
+ child{node[rectangle,draw]{}}
+  child{node[circle,draw] {e}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}}}}
+ child{node[circle,draw] {h}
+ child{node[circle,draw] {m}
+ child{node[rectangle,draw]{}}
+ child{node[rectangle,draw]{}}}
+  child{node[circle,draw] {e}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}}}};
+\draw [orange,thick] (3.5,0) node {roots}; %klammer um knoten s 
+\draw [orange,thick] (-0.5,0) node {(};
+\draw [orange,thick] (0.5,0) node {)};
+\draw [orange,thick] (4,-1) node {subtrees}; %klammer um knoten von subtrees dazischen komma
+\draw [orange,thick] (-2.2,-1.2) node {(};
+\draw [orange,thick] (0,-1.2) node {,};
+\draw [orange,thick] (2.2,-1.2) node {)};
+\end{tikzpicture}\\
+\uline{1. Rekursionaufruf}\\
+\begin{tikzpicture}[thick,level distance=1.2cm,level 1/.style={sibling distance=1.5cm},level 2/.style={sibling distance=0.75cm}]
+\node[circle,draw] {c}
+ child{node[rectangle,draw]{}}
+  child{node[circle,draw] {e}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}}};
+\draw (2.7,0) node[circle,draw] {h}
+ child{node[circle,draw] {m}
+ child{node[rectangle,draw]{}}
+ child{node[rectangle,draw]{}}}
+  child{node[circle,draw] {e}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}}};
+  \draw [orange,thick] (4,0) node {roots}; %klammer um knoten s 
+  \draw [orange,thick] (-0.5,0) node {(};
+  \draw [orange,thick] (1.5,0) node {,};
+  \draw [orange,thick] (3.2,0) node {)};
+  
+  \draw [orange,thick] (5,-1) node {subtrees}; %klammer um knoten von subtrees dazischen komma
+  \draw [orange,thick] (-1,-1.2) node {(};
+
+
+  \draw [orange,thick] (0,-1.2) node {,};
+  \draw [orange,thick] (1.4,-1.2) node {,};
+  \draw [orange,thick] (2.8,-1.2) node {,};
+  \draw [orange,thick] (4,-1.2) node {)};
+\end{tikzpicture}\\
+%tikzpicture mit c und h dann selbe lable wie subtrees vorher
+\uline{2. Rekursionaufruf}\\
+\begin{tikzpicture}[thick,level distance=1.2cm,level 1/.style={sibling distance=0.75cm}]
+\node[circle,draw] {e}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}};
+\draw (1.25,0) node[circle,draw] {m}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}};
+\draw (2.5,0) node[circle,draw] {e}
+  child{node[rectangle,draw]{}}
+  child{node[rectangle,draw]{}};
+  
+    \draw [orange,thick] (4,0) node {roots}; %klammer um knoten s 
+    \draw [orange,thick] (-0.5,0) node {(};
+    \draw [orange,thick] (0.6,0) node {,};
+    \draw [orange,thick] (2,0) node {,};
+    \draw [orange,thick] (3.2,0) node {)};
     
+    \draw [orange,thick] (5,-1) node {subtrees}; %klammer um knoten von subtrees dazischen komma
+    \draw [orange,thick] (-0.8,-1.2) node {(};
+    \draw [orange,thick] (0,-1.2) node {,};
+    \draw [orange,thick] (0.65,-1.2) node {,};
+    \draw [orange,thick] (1.3,-1.2) node {,};
+    \draw [orange,thick] (1.9,-1.2) node {,};
+    \draw [orange,thick] (2.5,-1.2) node {,};
+    \draw [orange,thick] (3.2,-1.2) node {)};
+      \draw (-0.6,-1) -- (-0.2,-1.4);
+      \draw (0.2,-1) -- (0.6,-1.4);
+      \draw (0.7,-1) -- (1.1,-1.4);
+      \draw (1.4,-1) -- (1.8,-1.4);
+      \draw (1.9,-1) -- (2.3,-1.4);
+      \draw (2.7,-1) -- (3.1,-1.4);
+\end{tikzpicture}\\
+%tikzpicture mit e und m und e dann selbe lable wie subtrees vorher (gibt nur roots)
+\uline{3. Rekursionsaufruf}\\
+\begin{tikzpicture}
+\draw (0,0);
+\draw (2,0) node {( )};
+\end{tikzpicture}
+\begin{lstlisting}[style=customc]
+(: traverse ((list-of (btree-of %a)) -> (list-of %a)))
+(define traverse
+  (lambda (ts)
+    (cond ((empty? ts) empty)
+          ((pair? ts)
+            (append (roots ts)
+                    (traverse (subtrees ts)))))))
+\end{lstlisting}
+\section{Neue Sprachebene DMdA-fortgeschritten}
+\begin{itemize}
+\item neues Ausgabevormat in der REPL (list $x_1\ x_2\ \ x_n$) $\rightsquigarrow$ ($x_1 \ x_2 \ \ x_n$)\\
+      empty $\rightsquigarrow$ ()\\
+\item Neuer  Gleichheitstest für Werte aller (auch benutzerdef.) Signaturen (:equal? ( \%a \%b -> boolean))
+\end{itemize}
+\subsection{Quote}
+Sei \la e\ra ein beliebiger Scheme-Ausdruck. Dann liefert (quote \la e\ra) die \uline{Representation} bon \la e\ra - \la e\ra wird \uline{nicht} ausgewertet.
+\subsubsection{Beispiele:}
+(quote 42) $\rightsquigarrow$ 42\\
+(quote "Leia") $\rightsquigarrow$ "Leia"\\
+(quote  \#t) $\rightsquigarrow$ \#t\\
+(quote + 40 2) $\rightsquigarrow$ (+ 40 2) \colorbox{red}{Funktionsapplikation repräsentiert als Liste}\\
+\uline{Abkürzung} (quote \la e\ra) $\equiv$ '\la e\ra
+
+Notation von Listenliteralen in Programmen ($c_i$ Komstanten)
+(list $c_1 \ c_2 \ \ c_n)$ $\equiv$ $'(c_1 \ c_2 \ \ c_n)$
+empty $\equiv$ $'$()
+\subsection{Symbole}
+Was ist (first (* 1 2))? Was sind lambda, x + in $'$(lambda (x) (+ x 1))?\\
+Neue Signatur \uline{symbol} zur Repräsentation von \uline{Namen} in Programmen. Effizientere interne Darstellung, effizient vegleichbar (not equal?). KEin Zugriff auf die einzelnen Zeichen des Symbols.
+$\text{lambda}\neq "\text{lambda}"$
+\subsection{Operatoren}
+\begin{lstlisting}[style=customc]
+(: symbol? ( %a -> boolean))
+(: symbol->string (symbol -> string))
+(: string->symbol (string -> symbol))
+\end{lstlisting}
 \end{document}
