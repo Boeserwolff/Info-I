@@ -1950,4 +1950,81 @@ $\text{lambda}\neq "\text{lambda}"$
 (: symbol->string (symbol -> string))
 (: string->symbol (string -> symbol))
 \end{lstlisting}
+\subsection{Natürliche Repräsentation und Auswertung}
+Natürliche Repräsentation und Auswertung arithmetischer Ausdrücke (Terme):\\
+\uline{Beispiel:}\\
+e $\equiv$ '(* (! (+ 1 2)) x) %Pfeil zu ! * x + symbols Pfeil zu 1 2 numbers
+\begin{lstlisting}[style=customc]
+(define term
+  (signature (mixed number
+                    symbol
+                    (list-of term))))
+\end{lstlisting}
+\begin{itemize}
+\item kein Parser benötigt
+\item kein Prettyprinter
+\end{itemize}
+Auswertung möglich, wenn Bindungen für Symbole (Variablen und Operatoren) an Werte gegeben sind. \uline{Dictionary} (\uline{Enviroment}):
+\begin{itemize}
+\item d1: \{ x$\rightarrow$ 3,\\
+\ \ \ \ \ \ \ \  *$\rightarrow$ \la procedure: *\ra,\\
++ $\rightarrow$ \la procedure: +\ra,\\
+\^ $\rightarrow$ \la procedure: expt\ra,\\
+! $\rightarrow$ fac\}\\
+e $\rightsquigarrow\rightsquigarrow$ 18
+\item d2: \{ x $\rightarrow$ 1,\\
+*$\rightarrow$ *,
++$\rightarrow$ +,
+\^$\rightarrow$ expt,
+!$\rightarrow$ (lambda (x) (-x)) \}
+e $\rightsquigarrow\rightsquigarrow$ -3
+\end{itemize}
+\subsection{Auswertung eines arithmetischen Ausdrucks e}
+Auswertung eines arithmetischen Ausdrucks e (im Enviroment d):\\
+ ((eval d) e)
+\begin{itemize}
+\item[($E_1$)] ((eval d) c) = c % c Konstante
+\item[($E_2$)] ((eval \{$x_1\rightarrow v_1, \ \ \ ,x_n \rightarrow v_n$\})$x_i$) = $v_i$ %X_i Variable
+\item[($E_3$)] ((eval d) ($e_1 \ e_2 \ ... \ e_n$)) = (... (((eval d) $e_1$) ((eval d) $e_2$))...((eval d) $e_n$))
+\end{itemize}
+\begin{tikzpicture}[thick,level distance=1.2cm,level 1/.style={sibling distance=2cm},level 2/.style={sibling distance=2.5cm}]
+\node {@}
+  child{node {@}
+  child{node{((eval d) $e_1$)}}
+  child{node{((eval d) $e_2$)}}}
+  child{node{((eval d) $e_n$)}};
+\end{tikzpicture}
+\begin{lstlisting}[style=customc]
+(: eval ((dict-of symbol value) -> (term -> value)))
+
+(define eval
+  (lambda (d)
+    (lambda (e)
+      (cond ((constant? e) e) ;(E1)
+            ((variable? e) (lookup-dict e d)) ;(E2)
+            ((compound? e) (let ((es (map (eval d) e)))
+                          (foldl (first es) @ (rest es))))))))
+      
+(: @ ((%a -> %b) %a -> %b))                   
+(define @
+  (lambda (f x)
+    (f x)))
+\end{lstlisting}
+\subsection{Lambda-Kalkül}
+Das $\lambda$-Kalkül ist eine Notation für \uline{beliebige Funktionen}. Entwicket in den  1930er Jahren von Alonzo Church (1903-1995) als neue Grundlage der Mathematik [aber die Mathematiker bevorzugen die Mengenlehre]. Seither verwendet als thearetischer Unterbau für Programmiersprachen.
+\subsection{Syntax des $\lambda$-Kalküls}
+Die Menge der Ausdrücke (\uline{expressions}) E des $\lambda$-Kalküls ist \uline{induktiv} definiert (sei V unendliche Memge von Variablennamen). 
+\begin{itemize}
+\item $\forall v \in V: v\in E$ [Variable]
+\item $\forall e_1,e_2\in E:$ ($e_1 e_2)\in E$ [Applikation] % e1 funktion e2 argument
+\item $\forall v \in V, e_1\in E:$ ($\lambda v.e_1)\in E$ [Abstraktion] %v Parameter e1 Rumpf
+\end{itemize}
+\uline{Beispiele}
+$y\in E$\\
+$(\lambda y.y) \in E$ Identitätsfunktion\\
+$(\lambda y.z) \in E$ Funktion ignoriert Arg. y, liefert z\\
+$((f x) y) \in E$ Anwendung von f auf x und y (Currying)\\
+$(\lambda f.(f\ x))\in E$ Anwendung von Argument f auf x (H.O.P., Typ 1)\\
+
+
 \end{document}
