@@ -2010,7 +2010,7 @@ Auswertung eines arithmetischen Ausdrucks e (im Enviroment d):\\
   (lambda (f x)
     (f x)))
 \end{lstlisting}
-\subsection{Lambda-Kalkül}
+\section{Lambda-Kalkül}
 Das $\lambda$-Kalkül ist eine Notation für \uline{beliebige Funktionen}. Entwicket in den  1930er Jahren von Alonzo Church (1903-1995) als neue Grundlage der Mathematik [aber die Mathematiker bevorzugen die Mengenlehre]. Seither verwendet als thearetischer Unterbau für Programmiersprachen.
 \subsection{Syntax des $\lambda$-Kalküls}
 Die Menge der Ausdrücke (\uline{expressions}) E des $\lambda$-Kalküls ist \uline{induktiv} definiert (sei V unendliche Memge von Variablennamen). 
@@ -2059,6 +2059,7 @@ Achtung: Bindung/Freiheit muss für jedes Vorkommen einer Variable seperat entsc
 free ($t_2$) = \{x\}\\
 bound ($t_2$) = \{x\}\\
 \\
+\subsection{$\beta$-Reduktion}
 Die Anwendung einer Funktion (= $\lambda$-Abstraktion) auf ein Argument wird im $\lambda$-Kalkül durch \uline{$\beta$-Reduktion}($\underset{\beta}{\rightarrow}$) beschrieben. Die Applikation($\lambda$v.$e_1$)$e_2$) wird durchgeführt, indem
 \begin{itemize}
 \item[(1)] eine Kopie des Rumpfes $e_1$ hergestellt wird und
@@ -2077,8 +2078,38 @@ $\underset{\beta}{\rightarrow}$ (* (+ b a) c)
 $\underset{\beta}{\rightarrow}$ (($\lambda$y.(* y b)) a)\\
 $\underset{\beta}{\rightarrow}$ (* a b) Curry
 \item
-(($\lambda$f.(f c))($\lambda$x.(+ x a))\\
+(($\lambda$f.(f c))($\lambda$x.(+ x a)))\\
 $\underset{\beta}{\rightarrow}$ (($\lambda$x.(+ x a)) c)\\
 $\underset{\beta}{\rightarrow}$ (+ c a) Higher-Order
+\item
+((($\lambda$x.($\lambda$y.x)) ($\lambda$z.y) \maltese) a) $muesste\ y\ liefern$\\
+$\underset{\beta}{\rightarrow}$((($\lambda$y.($\lambda$z.y)) \maltese) a)\\
+$\underset{\beta}{\rightarrow}$(($\lambda$z.\maltese) a)\\
+$\underset{\beta}{\rightarrow}$\maltese
 \end{itemize}
+\subsubsection{Definition $\beta$-Reduktion}
+(($\lambda$x.e) a) $\underset{\beta}{\rightarrow}$ e[x$\rightarrowtail$ a] "$ersetze\ freie\ Vorkommen\ von\ x\ in\ a$"\\
+\begin{itemize}
+\item[($\rightarrowtail_1$)] x[x $\rightarrowtail$ a] = a
+\item[($\rightarrowtail_2$)] v[x $\rightarrowtail$ a] = v
+\item[($\rightarrowtail_3$)] ($e_1\ e_2$)[x $\rightarrowtail$ a] = ($e_1$[x $\rightarrowtail$ a] $e_2$ [x $\rightarrowtail$ a])
+\item[($\rightarrowtail_4$)] ($\lambda$x.e)[x $\rightarrowtail$ a] = ($\lambda$x.e)
+\item[($\rightarrowtail_5$)] %Große klammer
+							($\lambda$x.e)[x $\rightarrowtail$ a] = ($\lambda$v.e[x $\rightarrowtail$ a]) falls v nicht frei in a!
+\item[($\rightarrowtail_6$)] ($\lambda$x.e)[x $\rightarrowtail$ a] = ($\lambda$v'.e[v $\rightarrowtail$ v']) [x $\rightarrowtail$ a] sonst v': neuer Variablenname
+\end{itemize}
+\uline{Beispiel:}
+((($\lambda$x.($\lambda$y.x)) ($\lambda$z.y) \maltese) a) $muegsste\ y\ liefern$\\
+$\underset{\beta}{\rightarrow}$ (((($\lambda$y.x)[x $\rightarrowtail$ ($\lambda$z.y)]) \maltese) a)\\
+$\underset{(\rightarrowtail_6)}{\rightarrow}$ (((($\lambda$y'.x[y $\rightarrowtail$ y'])[x $\rightarrowtail$ ($\lambda$z.y)]) \maltese) a)\\
+$\underset{(\rightarrowtail_2)}{\rightarrow}$ (((($\lambda$y'.x)[x $\rightarrowtail$($\lambda$z.y)])\maltese) a)\\
+$\underset{(\rightarrowtail_5)}{\rightarrow}$ (((($\lambda$y'.x[x $\rightarrowtail$ ($\lambda$z.y)]))\maltese) a)\\
+$\underset{(\rightarrowtail_1)}{\rightarrow}$ ((($\lambda$y'.($\lambda$z.y)) \maltese) a)\\
+$\underset{\beta}{\rightarrow}$ (($\lambda$z.y)[y' $\rightarrowtail$ \maltese] a)\\
+$\underset{(\rightarrowtail_5)}{\rightarrow}$ (($\lambda$z.y[y'$\rightarrowtail$ \maltese]) a)\\
+$\underset{(\rightarrowtail_2)}{\rightarrow}$ (($\lambda$z.y) a)\\
+$\underset{\beta}{\rightarrow}$ y[z $\rightarrowtail$ a]\\
+$\underset{(\rightarrowtail_2)}{\rightarrow}$ y
+
+
 \end{document}
