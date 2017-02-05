@@ -35,7 +35,7 @@
 %TODO: lstdefinelanguage auf DrRacket anpassen 
  
 \lstdefinelanguage{Dr}
-{morekeywords={one,two,three,four,five,six,seven,eight,
+{morekeywords={two,three,four,five,six,seven,eight,
 nine,ten,eleven,twelve,o,clock,rock,around,the,tonight},
 sensitive=false,
 morecomment=[l]{;},
@@ -199,7 +199,7 @@ Prozedur-Signaturen werden bei \uline{jeder} Anwendung der Funktion $\langle$id$
 \subsection{Testfälle}
 \uline{Testfälle} dokumentieren das erwartende Ergebnis einer Prozedur für ausgewählte Argumente:
 \begin{lstlisting}[style=customc]
-(check-expect §\la$\text{e}_1$\ra§ \la$\text{e}_2$\ra)
+(check-expect §\la$\text{e}_1$\ra§ §\la$\text{e}_2$\ra§)
 \end{lstlisting}
 %(check-expect $\langle e_1\rangle$ $\langle e_2 \rangle$)\\
 Werte den Ausdruck $\langle e_1\rangle$ aus und teste, ob der erhaltene Wert der Erwartung (=Wert des Ausdruck $\langle e_2 \rangle$) entspricht.\\
@@ -207,8 +207,8 @@ Einer Prozedurdefinition sollten Testfälle direkt vorangestellt werden.\\
 \warningsign   \enquote{check-expect} ist eine Spezialform und hat daher keinen Wert. Eine Testverletztung wird als Effekt protokolliert.
 \subsection{Erinnerung}\uline{Konstruktionsanleitung für Prozeduren:}
 \begin{itemize}
-\item kurzbeschreibung (ein- bis zweizeiliger Kommentar mit Bezug auf PArameternamen und Ergebnis)
-\item Signatur (:$\langle$ name $\rangle$ (... $\rightarrow$))
+\item Kurzbeschreibung (ein- bis zweizeiliger Kommentar mit Bezug auf Parameternamen und Ergebnis)
+\item Signatur (: $\langle$ name $\rangle$ (... $\rightarrow$))
 \item Testfälle check-expect/ ceack-within
 \item Prozedurgerüst (define $\langle$name$\rangle$ (lambda ($\langle p_1\rangle \langle p_2\rangle $ ))
 \item Rumpf programmieren $\langle$rumpf$\rangle$)
@@ -311,19 +311,21 @@ maximum $(x_1,x_2)= \left(\begin{array}{c} x_1 \text{ falls } x_1 \geq x_2 \\ x_
 Weiter: add?, even?, positive?, negative?, ...\\
 
 \subsection{Spezialform Fallunterscheidung (conditional)}
-
-(cond ($\langle t_1 \rangle \langle e_1 \rangle)\\
-(\langle t_2 \rangle \langle e_2 \rangle)\\
-...\\
-(\langle t_n \rangle \langle e_n \rangle)\\
-($else  $\langle e_{n+1} \rangle))$ <- optional
-\\
+\begin{lstlisting}[style=customc]
+(cond (§\la $t_1$\ra \la $e_1$\ra§)
+      (§\la $t_2$\ra \la $e_2$\ra§)
+      ...
+      (§\la $t_n$\ra \la $e_n$\ra§)
+      (else  §\la $e_{n+1}$\ra§)) ;<- optional
+\end{lstlisting}
 Führt die Tests in der Reihenfolge $\langle t_1 \rangle, \langle t_2 \rangle$, ... durch. Sobald $\langle t_i\rangle$ zu \#t auswertet, werte Zweig $\langle e_i\rangle$ aus. $\langle e_i\rangle $ ist das Ergebnis der Fallunterscheidung. Wenn $\langle t_n\rangle$ \#f liefert, dann liefere \\
-$\left(\begin{array}{l}\text{Fehlermeldung " cond: alle Tests ergeben }\#f \text{falls kein else- Zweig, sonst}\\ \langle_{n+1}\rangle \end{array}\right)$
+$\left(\begin{array}{l}\text{Fehlermeldung " cond: alle Tests ergeben }\#f \text{ falls kein else- Zweig, sonst}\\ \hfil \langle_{n+1}\rangle \end{array}\right)$
 
 Die Signatur \uline{one-of} lässt genau einen der n aufgezählten Werte zu:\\
-(one-of $\langle e_1\rangle \langle e_2\rangle$ ... $\langle e_n\rangle$ )
-\\
+\begin{lstlisting}[style=customc]
+(one-of §\la $e_1$\ra \la $e_2$\ra ... \la $e_n$\ra§)
+\end{lstlisting}
+
 Reduktion von cond [$eval_{cond}$]
 \begin{itemize}
 \item (cond ( $\langle t_1 \rangle$ $\langle e_1 \rangle$) ($\langle t_2 \rangle$ $\langle e_2 \rangle$ ) ...)
@@ -387,56 +389,66 @@ Record-Definition legst fest:
 \item Prädikat 			(später)
 \item Liste von Selektoren (lesen je eine Komponente des Record)
 \end{itemize}
-(define-record-procedures $\langle t\rangle$        Signaturname\\
-	make-$\langle t \rangle$                        ;Konstruktor\\
-	$\langle t \rangle$? 							;Prädikat\\
-	($\langle t \rangle$-$\langle comp_1 \rangle$   ;Liste der Selektoren\\
-	 ...
-	 $\langle t \rangle$-$\langle comp_n \rangle$))\\
+\begin{lstlisting}[style=customc]
+(define-record-procedures §\la t\ra§ Signaturname
+  make-§\la t\ra§              ;Konstruktor
+  §\la t\ra§                   ;Praedikat
+  (§\la t\ra-\la $comp_1$\ra§           ;Liste der Selektoren
+  ...
+  §\la t\ra-\la $comp_n$\ra§))
+	 \end{lstlisting}
 Liste der Selektoren legt Komponenten (Anzahl, Reihenfolge, Namen) fest.
 Signatur des Konstruktors/der Selektoren für Record-Signatur $\langle t \rangle$ mit n Komponenten $\langle comp_1\rangle$ ...  $\langle comp_n\rangle$:\\
 (: make $\langle t \rangle$ ($\underset{\text{n Komponentensignaturen}}{\langle t \rangle}$ ... $\langle t_n \rangle$ $\rightarrow \langle t \rangle $))\\
 
 (: $ \langle t \rangle$-$\langle comp_1 \rangle$ ($ \langle t \rangle \rightarrow \langle t_1 \rangle$))\\\\
-$\forall$ string n, boolean j, natural f:\\
-(character-name (make-character n j f)) $\rightsquigarrow$ n \\
-(character-jedi? (make-character n j f)) $\rightsquigarrow$ j \\
-(character-force (make-character n j f)) $\rightsquigarrow$ f \\
-\\
-Aussagen üver die Interaktion von zwei (oder mehr) Funktionen: algebraische \uline{Eigenschaft}.\\
+$\forall$ string n, boolean j, natural f:
+\begin{lstlisting}[style=customc]
+(character-name  (make-character n j f)) §$\rightsquigarrow$§ n 
+(character-jedi? (make-character n j f)) §$\rightsquigarrow$§ j 
+(character-force (make-character n j f)) §$\rightsquigarrow$§ f 
+\end{lstlisting}
+Aussagen über die Interaktion von zwei (oder mehr) Funktionen: algebraische \uline{Eigenschaft}.\\
 
 \subsection{Spezialform check-property}
+\begin{lstlisting}[style=customc]
 (check-property 
-	(for-all(($\langle id_1\rangle \langle signatur_1\rangle$)
-			   ...
-			   ($\langle id_n\rangle \langle signatur_n\rangle$))
-		$\langle expr \rangle$)) expr ist das Prädikat,  das sich auf $\langle id_q\rangle$ ... $\langle id_n\rangle$ bezieht.
+  (for-all ((§\la $id_1$\ra \la $signatur_1$\ra§)
+            ...
+            (§\la $id_n$\ra \la $signatur_n$\ra§))
+            §\la expr\ra§))
+\end{lstlisting}
+		 expr ist das Prädikat,  das sich auf $\langle id_q\rangle$ ... $\langle id_n\rangle$ bezieht.
 		\\
 Test erfolgreich, falls $\langle expr \rangle$ für beliebige Bindungen für $\langle id_1 \rangle$ ... $\langle id_n\rangle$ \uline{immer} \#t ergibt.\\
 
 \subsubsection{Interaktion von Konstruktor und Selektor}
+\begin{lstlisting}[style=customc]
 (check-property
-	(for-all ((n string)
-			  (j boolean)
-			  (f natural)))
-	(string=? (character-name (make-character n j f)) n))\\
-
+  (for-all ((n string)
+            (j boolean)
+            (f natural)))
+  (string=? (character-name (make-character n j f)) n))
+\end{lstlisting}
 \uline{Beispiel:} Die Summe zweier natürlicher Zahlen ist mindestens so groß wie jede dieser Zahlen. \\
-$\forall x_1,x_2 \in \mathbb{N}: x_1 +x_2 \geq max(x_1,x_2)$\\
+$\forall x_1,x_2 \in \mathbb{N}: x_1 +x_2 \geq max(x_1,x_2)$
+\begin{lstlisting}[style=customc]
 (check-property
-	(for-all (($x_1$ natural)\\
-			  ($x_2$ natural))\\
-	($\geq$(+ $x_1$ $x_2$) (max $x_1$ $x_2$))))\\
-	
-Konstruktion von Funktionen $\langle f \rangle$, die zusammengesetzte Daten der Signatur $\langle t \rangle$ \uline{konsumiert}.\\
+  (for-all ((§$x_1$§ natural)
+            (§$x_2$§ natural))
+  (§$\geq$§(+ §$x_1$§ §$x_2$§) (max §$x_1$§ §$x_2$§))))
+\end{lstlisting}	
+Konstruktion von Funktionen \la f\ra, die zusammengesetzte Daten der Signatur \la t\ra \uline{konsumiert}.\\
 \begin{itemize}
-\item Welchen Record-Komponenten $\langle comp_i \rangle$ sind relevant für $\langle f\rangle$?
-\item $\Rightarrow$ Schablone:\\
-(:$\langle f \rangle$ (... $\langle t \rangle$ ... $\rightarrow$ ...))\\
-(define $\langle$ f $\rangle$\\
-	(lambda (... r ...)\\
-		... ($\langle t\rangle$-$\langle comp_i\rangle$ r)...))\\
+\item Welchen Record-Komponenten $\langle comp_i \rangle$ sind relevant für \la f\ra?
+\item $\Rightarrow$ Schablone:
+\begin{lstlisting}[style=customc]
+(:§\la§f§\ra§(... §\la§t§\ra§ ... §$\rightarrow$§ ...))
+(define §\la§f§\ra§
+  (lambda (... r ...)
+   ... (§\la§t§\ra§-§\la $comp_i$\ra§ r)...))
 (: not (boolean -> boolean))
+\end{lstlisting}
 \end{itemize}
 Prozedur $\langle$f$\rangle$, die zusammengetzte Daten der Signatur $\langle$t$\rangle$ konstruiert/produziert.
 \begin{itemize}
@@ -2095,8 +2107,8 @@ $\underset{\beta}{\rightarrow}$\maltese
 \item[($\rightarrowtail_3$)] ($e_1\ e_2$)[x $\rightarrowtail$ a] = ($e_1$[x $\rightarrowtail$ a] $e_2$ [x $\rightarrowtail$ a])
 \item[($\rightarrowtail_4$)] ($\lambda$x.e)[x $\rightarrowtail$ a] = ($\lambda$x.e)
 \item[($\rightarrowtail_5$)] %Große klammer
-							($\lambda$x.e)[x $\rightarrowtail$ a] = ($\lambda$v.e[x $\rightarrowtail$ a]) falls v nicht frei in a!
-\item[($\rightarrowtail_6$)] ($\lambda$x.e)[x $\rightarrowtail$ a] = ($\lambda$v'.e[v $\rightarrowtail$ v']) [x $\rightarrowtail$ a] sonst v': neuer Variablenname
+							($\lambda$v.e)[x $\rightarrowtail$ a] = ($\lambda$v.e[x $\rightarrowtail$ a]) falls v nicht frei in a!
+\item[($\rightarrowtail_6$)] ($\lambda$v.e)[x $\rightarrowtail$ a] = ($\lambda$v'.e[v $\rightarrowtail$ v']) [x $\rightarrowtail$ a] sonst v': neuer Variablenname
 \end{itemize}
 \uline{Beispiel:}
 ((($\lambda$x.($\lambda$y.x)) ($\lambda$z.y) \maltese) a) $muegsste\ y\ liefern$\\
