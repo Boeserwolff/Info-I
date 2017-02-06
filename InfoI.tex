@@ -11,6 +11,7 @@
 \usepackage{graphicx}
 \usepackage{tikz}
 \usepackage{qtree}
+\usepackage{wasysym}
 \usepackage{csquotes}
 \usepackage{fancyhdr}
 \usepackage{amssymb}
@@ -564,7 +565,7 @@ Das Prädikat \la t\ra? einer Record-Signatur \la t\ra  unterscheidet Werte der 
 Auch: & Prädikate für eingebaute Signaturen.\\
  & number?, complex?, real?, rational?, integer?,\\ 
  & natural?, string?, boolean?
-\end{tabular}
+\end{tabular}\\
 Prozeduren, die gemischte Daten der Singatuen \la $t_1$\ra ... \la $t_n $ \ra konsumieren:
 \begin{lstlisting}[style=customc]
 (: §\la§f§\ra§(()mixed §\la$t_1$\ra§ ... §\la $t_2$\ra§)-> ...))
@@ -615,19 +616,17 @@ Beispiele:
   (cond ((= i 1) x)
         ((= i 2) y))))         
 \end{lstlisting}
-Beachte: Parametrisch polymorphe Prozeduren "wissen nichts" über ihre Argumente mit Signatur \%a, \%b, ... und können diese \uline{nur} reproduzieren oder an andere polymorphe Prozeduren weiterreichen.\\
+Beachte: Parametrisch polymorphe Prozeduren "wissen nichts"\ über ihre Argumente mit Signatur \%a, \%b, ... und können diese \uline{nur} reproduzieren oder an andere polymorphe Prozeduren weiterreichen.\\
 Eine polymorphe Signatur steht für die Signaturen, in denen die Signaturvariablen \uline{konistent} durch konkrete Signaturen ersetzt werden. \\\\
 Beispiel:
 
 Wenn eine Prozedur ( \%a number  \%b -> \%a) erfüllt, dann auch 
-
+\begin{lstlisting}[style=customc]
 (string number boolean -> string)
-
 (boolean number natural -> boolean)
-
 (string number string -> string)
-
 (number number number -> number)
+\end{lstlisting}
 \newpage
 \subsection{Polymorphe Paare und Listen}
 \begin{lstlisting}[style=customc]
@@ -670,7 +669,7 @@ Eine \uline{Liste} von Werten der Signatur \la t\ra, (list-of \la t\ra), ist ent
                     (pair-of t (list-of t))
                                          ))))
 \end{lstlisting}
-(list-of \la t\ra). Listen, deren Elemente die Signatur \la t\ra besitzen.\\
+(list-of \la t\ra). Listen, deren Elemente die Signatur \la t\ra\ besitzen.\\
 Die Signatur empty-list ist bereits in DrRacket vordefiniert. \\Ebenfalls vordefiniert ist:
 \begin{itemize}[-]
 \item (: empty empty-list)
@@ -681,7 +680,7 @@ Die Signatur empty-list ist bereits in DrRacket vordefiniert. \\Ebenfalls vordef
 (make-pair 1 (make-pair 2 empty))
 \end{lstlisting}
 \begin{tabular}{lcl}
-lightning &
+\lightning &
 \begin{tabular}{|c|c|}
 \hline & 
 \\ 
@@ -720,14 +719,14 @@ prequels+trilogy:\\
 				child{node{RotS}}
 				child{node{empty}}}}edge from parent[blue]}
 	child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
-		child{node[rectangle,draw]{\ \ \ |\ \ \ \ }
+		child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
 			child{node{ANH}}
 			child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
 				child{node{TESB}}
 					child{node[rectangle,draw,color=black]{\ \ \ |\ \ \ \ }
 					child{node{RotJ}}
 					child{node{empty}}}}edge from parent[red]}
-		child{node{empty}}}
+		child{node{empty}edge from parent[green]}edge from parent[green]}
 	;
 \end{tikzpicture}
 
@@ -758,7 +757,7 @@ Schablone für Funktion \la f\ra, die Liste xs konsumiert:
  (lambda (xs)
   (cond ((empty? xs) ... )
         ((pair?  xs) ... (first xs) ... (§\la§f§\ra§ (rest xs)) ....))))
-					    Signatur t_1			signatur t_2
+		         ;Signatur §$t_1$§    ;signatur §$t_2$§
 \end{lstlisting}
 
 \section{Neue Sprachebene "Macht der Abstraktion"}
@@ -767,10 +766,10 @@ Schablone für Funktion \la f\ra, die Liste xs konsumiert:
 \item Neuer syntaktischer Zucker eingebaut: \\
  (list \la$e_1$\ra \la$e_2$\ra ... \la$e_n$\ra)\\
  $\equiv$\\
- (m-p \la$e_1$\ra
-			 (m-p \la$e_2$\ra\\
+ (make-pair \la$e_1$\ra  
+			 (make-pair \la$e_2$\ra\\
 			 ...\\
-			 (m-p \la$e_n$ empty) ..))\\
+			 (make-pair \la$e_n$ empty) ..))\\
 \item Ausgabeformat für nicht-leere Listen \\
 \#\la list \la$e_1$\ra \la$e_2$\ra ... \la$e_n$\ra\ra
 \end{itemize}
@@ -1334,7 +1333,7 @@ Spine-Transformation
 Teachpack universe nutzt H.O.P., um Animationen (=Sequenzen von Szenen/Bildern) zu definieren.
 \begin{lstlisting}[style=customc]
 (big-bang §\la$init$\ra§
-	(an-tick §\la§ tok§\ra§)
+	(an-tick §\la§tok§\ra§)
 	(to-draw §\la§render§\ra§ §\la§w§\ra§ §\la§h§\ra§))
 		   
 (: §\la§init§\ra§ %a)    	;Startzustand
@@ -1355,7 +1354,7 @@ Mathematik: (compose f g) $\equiv f \circ g $ "f nach g" $\Rightarrow$ compose \
 (: compose ((%b -> %c) ( %a -> %b) -> ( %a -> %c)))
 
 (define compose
-  (lamda f g)
+  (lamda (f g)
     (lambda (x)    ;Ergebnis ist eine
       (f (g x))))) ;Funktion (nicht angewandt)
 \end{lstlisting}
@@ -1438,7 +1437,7 @@ Bestimmung der ersten Ableitung der reellen Funktion f durch Bildung des \uline{
 (Hier Bild mit x und y achse und schaubild) $\frac{f(x+h)-f(x)}{h}$ Differenzenquotient
 											$\lim\limits_{0} \frac{f(x+h)-f(x)}{h}=f'(x)$ Differentialquotient
 \begin{itemize}
-\item Operator ' (Ableitung) konsumiert funktion f ind produziert f' $\Rightarrow $ ' ist higher-order
+\item Operator ' (Ableitung) konsumiert Funktion f und produziert f' $\Rightarrow $ ' ist higher-order
 \end{itemize}
 
 \subsection{Streams (stream-of \% a)}
@@ -1759,7 +1758,7 @@ $t \equiv \Downarrow$\\
 \subsection{Baumdurchläufe}
 Ein \uline{Tiefnedurchlauf} (depth-first traversal) eines Baumes t sammelt die Markierungen jedes Knoten n un t auf. Die Markierungen der Teilbäume l,r des Knotens n=(make-node l x r) werden \uline{vor} x eingesammelt. (Durchlauf zuerst in der Tiefe)
 
-Je anchdem, ob x (a) zwischen, (b) vor, (c) nach den Markierungen von l,r eingeordnet wird, erhält man 
+Je nachdem, ob x (a) zwischen, (b) vor, (c) nach den Markierungen von l,r eingeordnet wird, erhält man 
 \begin{itemize}
 \item[(a)] \uline{inorder} traversal \ \ \ \ (1) (2) (3)
 \item[(b)] \uline{preorder} traversal \ \ (2) (1) (3) 
@@ -1789,7 +1788,7 @@ child{node[rectangle,draw]{}}};
 \end{tikzpicture}\\
 \subsubsection{Beispiel}
 Baumdarstellung des arithmetischen Ausdrucks (Term)\\
-$2+3\cdot 4 \leftarrow$ x bindet stärker als +\\
+$2+3\cdot 4 \leftarrow$ $\cdot$ bindet stärker als +\\
  \begin{tikzpicture}[thick,level distance=1.2cm,level 2/.style={sibling distance=1.5cm},level 1/.style={sibling distance=2.5cm},level 3/.style={sibling distance=1cm}]
  \node [circle,draw] {+}
  child{node[circle,draw] {2}
@@ -1936,12 +1935,12 @@ Idee: Gegeben sei eine Liste ts von Bäumen
 \end{lstlisting}
 \section{Neue Sprachebene DMdA-fortgeschritten}
 \begin{itemize}
-\item neues Ausgabevormat in der REPL (list $x_1\ x_2\ \ x_n$) $\rightsquigarrow$ ($x_1 \ x_2 \ \ x_n$)\\
+\item neues Ausgabeformat in der REPL (list $x_1\ x_2\ \ x_n$) $\rightsquigarrow$ ($x_1 \ x_2 \ \ x_n$)\\
       empty $\rightsquigarrow$ ()\\
 \item Neuer  Gleichheitstest für Werte aller (auch benutzerdef.) Signaturen (:equal? ( \%a \%b -> boolean))
 \end{itemize}
 \subsection{Quote}
-Sei \la e\ra ein beliebiger Scheme-Ausdruck. Dann liefert (quote \la e\ra) die \uline{Representation} bon \la e\ra - \la e\ra wird \uline{nicht} ausgewertet.
+Sei \la e\ra\ ein beliebiger Scheme-Ausdruck. Dann liefert (quote \la e\ra) die \uline{Repräsentation} von \la e\ra\ - \la e\ra\ wird \uline{nicht} ausgewertet.
 \subsubsection{Beispiele:}
 (quote 42) $\rightsquigarrow$ 42\\
 (quote "Leia") $\rightsquigarrow$ "Leia"\\
@@ -1950,11 +1949,11 @@ Sei \la e\ra ein beliebiger Scheme-Ausdruck. Dann liefert (quote \la e\ra) die \
 \uline{Abkürzung} (quote \la e\ra) $\equiv$ '\la e\ra
 
 Notation von Listenliteralen in Programmen ($c_i$ Komstanten)
-(list $c_1 \ c_2 \ \ c_n)$ $\equiv$ $'(c_1 \ c_2 \ \ c_n)$
+(list $c_1 \ c_2 \ \ c_n)$ $\equiv$ $'(c_1 \ c_2 \ \ c_n)$\\
 empty $\equiv$ $'$()
 \subsection{Symbole}
 Was ist (first (* 1 2))? Was sind lambda, x + in $'$(lambda (x) (+ x 1))?\\
-Neue Signatur \uline{symbol} zur Repräsentation von \uline{Namen} in Programmen. Effizientere interne Darstellung, effizient vegleichbar (not equal?). KEin Zugriff auf die einzelnen Zeichen des Symbols.
+Neue Signatur \uline{symbol} zur Repräsentation von \uline{Namen} in Programmen. Effizientere interne Darstellung, effizient vegleichbar (not equal?). Kein Zugriff auf die einzelnen Zeichen des Symbols.
 $\text{lambda}\neq "\text{lambda}"$
 \subsection{Operatoren}
 \begin{lstlisting}[style=customc]
@@ -2023,7 +2022,7 @@ Auswertung eines arithmetischen Ausdrucks e (im Enviroment d):\\
     (f x)))
 \end{lstlisting}
 \section{Lambda-Kalkül}
-Das $\lambda$-Kalkül ist eine Notation für \uline{beliebige Funktionen}. Entwicket in den  1930er Jahren von Alonzo Church (1903-1995) als neue Grundlage der Mathematik [aber die Mathematiker bevorzugen die Mengenlehre]. Seither verwendet als thearetischer Unterbau für Programmiersprachen.
+Das $\lambda$-Kalkül ist eine Notation für \uline{beliebige Funktionen}. Entwicket in den  1930er Jahren von Alonzo Church (1903-1995) als neue Grundlage der Mathematik [aber die Mathematiker bevorzugen die Mengenlehre]. Seither verwendet als theoretischer Unterbau für Programmiersprachen.
 \subsection{Syntax des $\lambda$-Kalküls}
 Die Menge der Ausdrücke (\uline{expressions}) E des $\lambda$-Kalküls ist \uline{induktiv} definiert (sei V unendliche Memge von Variablennamen). 
 \begin{itemize}
